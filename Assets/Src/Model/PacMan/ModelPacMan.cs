@@ -20,7 +20,6 @@ namespace Game.Model
     public partial class ModelPacMan : ModelBase, IModelPacMan
     {
 
-        eDirection _eDirectionGhostA;
         ePacmanPosition _ePacmanPosition;
         eDirection _eDirectionGhostB_last;
         eDirection _eDirectionGhostB_current;
@@ -67,13 +66,11 @@ namespace Game.Model
 
         void IModelPacMan.UpdateGhostA(eDirection direction)
         {
-            _eDirectionGhostA = eDirection.DOWN;
             _ePacmanPosition = ePacmanPosition.DownDown;
             CreateAndExecuteTurn(
                 (ITurn turn) =>
                 {
                     CmdMoveGhostA cmdMoveGhostA = new CmdMoveGhostA(direction, _ePacmanPosition);
-                    //CmdMoveGhostA cmdMoveGhostA = new CmdMoveGhostA(_eDirectionGhostA, _ePacmanPosition);
                     turn.Push(cmdMoveGhostA);
                 });
         }
