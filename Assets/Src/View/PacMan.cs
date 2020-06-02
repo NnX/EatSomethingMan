@@ -59,7 +59,7 @@ namespace Game.View
             if (other.name == "Coin(Clone)")
             {
                 CoinCounter++;
-                if(CoinCounter == ((12*16) - 2))
+                if(CoinCounter == Constant.FieldSize - 1)
                 {
                     Debug.Log("YOU WIN!!!");
                     SceneManager.LoadScene("win", LoadSceneMode.Single);

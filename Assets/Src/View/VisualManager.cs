@@ -43,9 +43,8 @@ namespace Game.View
             {
                 for (int y = 0; y < Constant.FieldHeight; y++)
                 {
-                    if((x * y) != cherryPosition)
+                    if(((x * Constant.FieldHeight) + y) != cherryPosition)
                     {
-
                         Vector2 position = PositionManager.GetPosition(x, y);
                         GameObject c = Instantiate(_coinPrefab) as GameObject;
                         c.transform.localPosition = position;
@@ -57,7 +56,6 @@ namespace Game.View
 
         public int SpawnCherry()
         {
-            int fieldSize = Constant.FieldWidth * Constant.FieldHeight;
             int cherryPositionX = UnityEngine.Random.Range(Constant.FieldWidth / 2, Constant.FieldWidth - 1);
             int cherryPositionY = UnityEngine.Random.Range(Constant.FieldHeight / 2, Constant.FieldHeight - 1);
 
@@ -65,7 +63,7 @@ namespace Game.View
             GameObject g = Instantiate(_cherryPrefab);
             g.transform.localPosition = position;
 
-            return cherryPositionX * cherryPositionY;
+            return (cherryPositionX * Constant.FieldHeight) + cherryPositionY;
         }
 
         // ============ IVisualManager =================

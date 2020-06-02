@@ -99,7 +99,7 @@ namespace Game.Model
                     {
                         direction_counter = 0;
                     }
-                    if (direction_counter == DIRECTION_MAX) // fix sticking to borders
+                    if (direction_counter == DIRECTION_MAX) // fixed sticking to borders
                     {
                         while(_eDirectionGhostB_last == _eDirectionGhostB_current)
                         {
