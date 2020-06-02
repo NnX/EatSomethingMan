@@ -61,9 +61,9 @@ namespace Game.View
             int cherryPositionX = UnityEngine.Random.Range(Constant.FieldWidth / 2, Constant.FieldWidth - 1);
             int cherryPositionY = UnityEngine.Random.Range(Constant.FieldHeight / 2, Constant.FieldHeight - 1);
 
-            //Vector2 position = PositionManager.GetPosition(cherryPositionX, cherryPositionY);
-            //GameObject g = Instantiate(_cherryPrefab) as GameObject;
-            //g.transform.localPosition = position;
+            Vector2 position = PositionManager.GetPosition(cherryPositionX, cherryPositionY);
+            GameObject g = Instantiate(_cherryPrefab);
+            g.transform.localPosition = position;
 
             return cherryPositionX * cherryPositionY;
         }
