@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 using Game.Model;
 using Game.Misc;
 
@@ -15,7 +16,8 @@ namespace Game
         View.VisualManager _visualManager;
 
         IModelPacMan _model = new ModelPacMan();
-
+        [SerializeField]
+        public UnityEvent _cherryEvent = new UnityEvent();
         // ====================================
 
         View.IVisualManager VisualManager => _visualManager;
@@ -25,8 +27,8 @@ namespace Game
         IEnumerator Start()
         {
             VisualManager.Init(_model.EventManager, ITERATION_TIME);
-
-            _model.Init();
+            _cherryEvent.AddListener(CherryConsumed);
+            _model.Init(_cherryEvent);
             _model.InitGhostA();
             _model.InitGhostB();
             while (true)
@@ -83,6 +85,11 @@ namespace Game
                 current_direction = eDirection.LEFT;
                 _visualManager.RotatePacMan(180);
             }
+        }
+
+        public void CherryConsumed()
+        {
+            print("[print][GameMediator] Cherry consumed");
         }
     }
 }

@@ -1,10 +1,10 @@
 using UnityEngine;
-
+using UnityEngine.Events;
 namespace Game.View
 { 
     public interface ICharactersFactory
     {
-        IPacMan CreatePacMan(Transform parentTransform, Vector2 position);
+        IPacMan CreatePacMan(Transform parentTransform, Vector2 position, UnityEvent unityEvent);
         IGhostA CreateGhostA(Transform parentTransform, Vector2 position);
         IGhostB CreateGhostB(Transform parentTransform, Vector2 position);
     }
@@ -22,8 +22,8 @@ namespace Game.View
 
         // ========== ICharactersFactory ============
 
-        IPacMan ICharactersFactory.CreatePacMan(Transform parentTransform, Vector2 position)
-        { return _pacManPrefab.CloneMe(parentTransform, position); }
+        IPacMan ICharactersFactory.CreatePacMan(Transform parentTransform, Vector2 position, UnityEvent unityEvent)
+        { return _pacManPrefab.CloneMe(parentTransform, position, unityEvent); }
 
         IGhostA ICharactersFactory.CreateGhostA(Transform parentTransform, Vector2 position)
         { return _ghostAPrefab.CloneMe(parentTransform, position); }

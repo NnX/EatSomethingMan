@@ -1,7 +1,7 @@
-using Game.Misc;
 using UnityEngine;
 using WCTools;
 using UnityEngine.SceneManagement;
+using UnityEngine.Events;
 
 namespace Game.View
 { 
@@ -15,8 +15,18 @@ namespace Game.View
 
     public class PacMan : MonoBehaviour, IPacMan
     {
+        private void OnEnable()
+        {
+        }
+
+        private void OnDisable()
+        {
+            
+        }
+
         int CoinCounter = 0;
-        public IPacMan CloneMe(Transform parent, Vector2 position)
+        UnityEvent _unityEvent;
+        public IPacMan CloneMe(Transform parent, Vector2 position, UnityEvent unityEvent)
         {
             GameObject newObj = Instantiate(gameObject, parent);
             BoxCollider2D boxCollider = newObj.AddComponent<BoxCollider2D>();
@@ -25,7 +35,7 @@ namespace Game.View
             rigid.bodyType = RigidbodyType2D.Kinematic;
             PacMan pacMan = newObj.GetComponent<PacMan>();
             pacMan.transform.localPosition = position;
-                
+            pacMan._unityEvent = unityEvent;
             return pacMan;
         }
 
@@ -51,20 +61,25 @@ namespace Game.View
 
         void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.name != "Coin(Clone)")
-            {
-                Debug.Log("PacMan trigger = " + other.name);
-            }
 
-            if (other.name == "Coin(Clone)")
-            {
-                CoinCounter++;
-                if(CoinCounter == Constant.FieldSize - 1)
-                {
-                    Debug.Log("YOU WIN!!!");
-                    SceneManager.LoadScene("win", LoadSceneMode.Single);
-                }
-            }
+            switch (other.name) {
+                case "Coin(Clone)":
+                    CoinCounter++;
+                    if (CoinCounter == Constant.FieldSize - 1)
+                    {
+                        Debug.Log("YOU WIN!!!");
+                        SceneManager.LoadScene("win", LoadSceneMode.Single);
+                    }
+                    break;
+                case "Cherry(Clone)":
+                    /* GetComponent<PacMan>()?.transform.GetComponent<VisualManager>()?.OnCherryConsumed(); //To use this case we should add visual manager 
+                    GetComponent<VisualManager>()?.OnCherryConsumed();                                      //script to PacMan prefab in the inspector, and this smells not good */
+                    GetComponent<PacMan>()._unityEvent.Invoke(); // TODO find a better way to toss this event in GameMediator
+                    break;
+                default:
+                    Debug.Log("PacMan trigger = " + other.name);
+                    break;
+            } 
         }
 
         public void Rotate(float degrees)

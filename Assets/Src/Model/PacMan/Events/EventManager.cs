@@ -1,6 +1,8 @@
+
+using UnityEngine.Events;
 namespace Game.Model
 {
-    public delegate void dCreatePacMan(int x, int y);
+    public delegate void dCreatePacMan(int x, int y, UnityEvent unityEvent);
     public delegate void dCreateGhostA(int x, int y);
     public delegate void dCreateGhostB(int x, int y);
     public delegate void dUpdateGhostAPosition(int x, int y);
@@ -20,9 +22,9 @@ namespace Game.Model
 
     public interface IPacManEventsWritable
     {
-        void CreatePacMan(int x, int y);
+        void CreatePacMan(int x, int y, UnityEvent unityEvent);
         void UpdatePacManPosition(int x, int y);
- 
+
         void CreateGhostA(int x, int y);
         void CreateGhostB(int x, int y);
         void UpdateGhostAPosition(int x, int y);
@@ -44,8 +46,10 @@ namespace Game.Model
 
         // ========= IPacManEventsWritable =========
 
-        void IPacManEventsWritable.CreatePacMan(int x, int y)
-        { OnCreatePacMan?.Invoke(x, y); }
+        void IPacManEventsWritable.CreatePacMan(int x, int y, UnityEvent unityEvent)
+
+        {
+            OnCreatePacMan?.Invoke(x, y, unityEvent); }
 
         void IPacManEventsWritable.UpdatePacManPosition(int x, int y)
         { OnUpdatePacManPosition?.Invoke(x, y); }

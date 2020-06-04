@@ -71,8 +71,6 @@ namespace Game.Model
                         _direction = eDirection.RIGHT;
                         break;
                 }
-
-
             } 
         }
     }

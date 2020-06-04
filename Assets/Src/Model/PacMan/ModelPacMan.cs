@@ -1,5 +1,6 @@
 using Game.Misc;
 using UnityEngine;
+using UnityEngine.Events;
 namespace Game.Model
 {
     public interface IModelPacMan
@@ -7,6 +8,7 @@ namespace Game.Model
         IEventManager EventManager { get; }
 
         void Init();
+        void Init(UnityEvent cherryEvent);
         void Update(eDirection direction);
         void InitGhostA();
         void UpdateGhostA(eDirection direction);
@@ -25,6 +27,7 @@ namespace Game.Model
         eDirection _eDirectionGhostB_current;
         int direction_counter = 0;
         int DIRECTION_MAX = 7;
+        UnityEvent _cherryEvent;
 
         protected override void RegisterEvents(IEventManagerInternal eventManager)
         {
@@ -41,7 +44,17 @@ namespace Game.Model
             CreateAndExecuteTurn(
                 (ITurn turn) =>
                 {
-                    turn.Push(new CmdCreatePacMan(0, 0));
+                    turn.Push(new CmdCreatePacMan(0, 0, _cherryEvent));
+                });
+        }
+
+        void IModelPacMan.Init(UnityEvent cherryEvent)
+        {
+            _cherryEvent = cherryEvent;
+            CreateAndExecuteTurn(
+                (ITurn turn) =>
+                {
+                    turn.Push(new CmdCreatePacMan(0, 0, _cherryEvent));
                 });
         }
 

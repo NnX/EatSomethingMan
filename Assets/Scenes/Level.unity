@@ -183,6 +183,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _visualManager: {fileID: 2067067744}
+  _cherryEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!4 &38044681
 Transform:
   m_ObjectHideFlags: 0

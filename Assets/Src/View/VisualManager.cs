@@ -1,7 +1,5 @@
-using System;
-using Game.Misc;
-using Game.Model;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Game.View
 {
@@ -80,10 +78,10 @@ namespace Game.View
 
             eventsManager.Get<Model.IPacManEvents>().OnCreateGhostB += OnCreateGhostB;
             eventsManager.Get<Model.IPacManEvents>().UpdateGhostBPosition += UpdateGhostBPosition;
+
             int cherryPosition = SpawnCherry();
             SpawnCoins(cherryPosition);
         }
- 
 
         private void UpdateGhostBPosition(int x, int y)
         {
@@ -111,10 +109,10 @@ namespace Game.View
 
         // =============================================
 
-        void OnCreatePacMan(int x, int y)
+        void OnCreatePacMan(int x, int y, UnityEvent unityEvent)
         {
             Vector2 position = PositionManager.GetPosition(x, y);
-            _pacMan = CharactersFactory.CreatePacMan(_gameObjectsParent, position);
+            _pacMan = CharactersFactory.CreatePacMan(_gameObjectsParent, position, unityEvent);
         }
 
         void OnUpdatePacManPosition(int x, int y)
@@ -127,6 +125,6 @@ namespace Game.View
         public void RotatePacMan(float degrees)
         {
             _degrees = degrees;
-        } 
+        }
     }
 }

@@ -2,5 +2,7 @@
 Logs/
 Temp/
 obj/
+Library/
 Library/Artifacts/
 Library/StateCache/
+Library/ScriptAssemblies/
