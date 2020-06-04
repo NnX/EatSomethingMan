@@ -15,15 +15,6 @@ namespace Game.View
 
     public class PacMan : MonoBehaviour, IPacMan
     {
-        private void OnEnable()
-        {
-        }
-
-        private void OnDisable()
-        {
-            
-        }
-
         int CoinCounter = 0;
         UnityEvent _unityEvent;
         public IPacMan CloneMe(Transform parent, Vector2 position, UnityEvent unityEvent)

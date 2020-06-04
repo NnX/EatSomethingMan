@@ -16,7 +16,6 @@ namespace Game
         View.VisualManager _visualManager;
 
         IModelPacMan _model = new ModelPacMan();
-        [SerializeField]
         public UnityEvent _cherryEvent = new UnityEvent();
         // ====================================
 

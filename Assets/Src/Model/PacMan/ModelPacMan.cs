@@ -7,7 +7,6 @@ namespace Game.Model
     {
         IEventManager EventManager { get; }
 
-        void Init();
         void Init(UnityEvent cherryEvent);
         void Update(eDirection direction);
         void InitGhostA();
@@ -37,16 +36,6 @@ namespace Game.Model
         // ============== IModelPacMan =================
 
         IEventManager IModelPacMan.EventManager => EventManager;
-
-
-        void IModelPacMan.Init()
-        {
-            CreateAndExecuteTurn(
-                (ITurn turn) =>
-                {
-                    turn.Push(new CmdCreatePacMan(0, 0, _cherryEvent));
-                });
-        }
 
         void IModelPacMan.Init(UnityEvent cherryEvent)
         {

@@ -29,7 +29,6 @@ namespace Game.Model
                     pacMan.UpdatePosition(nextPositon.x, nextPositon.y);
                     context.EventManager.Get<IPacManEventsWritable>().UpdatePacManPosition(nextPositon.x, nextPositon.y);
                 }  
-
             }
         }
     }

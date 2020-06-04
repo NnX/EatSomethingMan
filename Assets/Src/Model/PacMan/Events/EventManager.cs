@@ -48,8 +48,7 @@ namespace Game.Model
 
         void IPacManEventsWritable.CreatePacMan(int x, int y, UnityEvent unityEvent)
 
-        {
-            OnCreatePacMan?.Invoke(x, y, unityEvent); }
+        { OnCreatePacMan?.Invoke(x, y, unityEvent); }
 
         void IPacManEventsWritable.UpdatePacManPosition(int x, int y)
         { OnUpdatePacManPosition?.Invoke(x, y); }
