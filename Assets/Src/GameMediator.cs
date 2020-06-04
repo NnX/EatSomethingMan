@@ -9,14 +9,17 @@ namespace Game
     public class GameMediator : MonoBehaviour
     {
         public const int FIELD_WIDTH = 16;
+        public const float DINNER_TIME = 5f;
         const float ITERATION_TIME = 0.5f;
         eDirection current_direction = eDirection.RIGHT;
         eDirection ghost_direction = eDirection.DOWN;
         [SerializeField]
         View.VisualManager _visualManager;
 
-        IModelPacMan _model = new ModelPacMan();
         public UnityEvent _cherryEvent = new UnityEvent();
+        IModelPacMan _model = new ModelPacMan();
+        bool _isCherryConsumed = false;
+        float dinnerTimestart;
         // ====================================
 
         View.IVisualManager VisualManager => _visualManager;
@@ -30,8 +33,22 @@ namespace Game
             _model.Init(_cherryEvent);
             _model.InitGhostA();
             _model.InitGhostB();
+
+            int cherryPosition = _visualManager.SpawnCherry(true);
+            _visualManager.SpawnCoins(cherryPosition);
+
             while (true)
             {
+                if(_isCherryConsumed)
+                {
+                    float elapsedTime = Time.realtimeSinceStartup - dinnerTimestart;
+                    if (elapsedTime > DINNER_TIME)
+                    {
+                        _isCherryConsumed = false;
+                        _visualManager.SpawnCherry(false);
+                    }
+
+                }
                 _model.Update(current_direction);
                 _model.UpdateGhostA(ghost_direction);
                 _model.UpdateGhostB();
@@ -89,6 +106,8 @@ namespace Game
         public void CherryConsumed()
         {
             print("[print][GameMediator] Cherry consumed");
+            _isCherryConsumed = true;
+            dinnerTimestart = Time.realtimeSinceStartup;
         }
     }
 }

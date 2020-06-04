@@ -1,14 +1,32 @@
 using UnityEngine;
 using UnityEngine.Events;
+using System.Collections.Generic;
 
 namespace Game.View
 {
+    [System.Serializable]
+    public class CoinCollectedEvent : UnityEvent<int, int>
+    {
+    }
+
+    public class Pair {
+        public int X { get; set; }
+        public int Y { get; set; }
+
+        public Pair(int x , int y)
+        {
+            X = x;
+            Y = y;
+        }
+    }
+
+
     public interface IVisualManager
     {
         void Init(Model.IEventManager eventsManager, float iterationTime);
         void SpawnCoins(int cherryPosition);
         void RotatePacMan(float degrees);
-        int SpawnCherry();
+        int SpawnCherry(bool isInit);
     }
 
     // #################################################
@@ -29,7 +47,8 @@ namespace Game.View
         public GameObject _cherryPrefab;
         IGhostA _ghostA;
         IGhostB _ghostB;
-
+        public CoinCollectedEvent _coinEvent;
+        List<Pair> _freeSqares = new List<Pair>();
         // =============================================
 
         ICharactersFactory CharactersFactory => _charactersFactory;
@@ -45,22 +64,35 @@ namespace Game.View
                     {
                         Vector2 position = PositionManager.GetPosition(x, y);
                         GameObject c = Instantiate(_coinPrefab) as GameObject;
+                        coin bitcoin = c.GetComponent<coin>();
+                        bitcoin._coinEvent = _coinEvent;
+                        bitcoin.X = x;
+                        bitcoin.Y = y;
                         c.transform.localPosition = position;
                     }
-
                 }
             }
         }
 
-        public int SpawnCherry()
+        public int SpawnCherry(bool isInit)
         {
-            int cherryPositionX = UnityEngine.Random.Range(Constant.FieldWidth / 2, Constant.FieldWidth - 1);
-            int cherryPositionY = UnityEngine.Random.Range(Constant.FieldHeight / 2, Constant.FieldHeight - 1);
+            int cherryPositionX = 0;
+            int cherryPositionY = 0;
+            if(isInit)
+            {
+                cherryPositionX = UnityEngine.Random.Range(Constant.FieldWidth / 2, Constant.FieldWidth - 1);
+                cherryPositionY = UnityEngine.Random.Range(Constant.FieldHeight / 2, Constant.FieldHeight - 1);
+
+            } else
+            {
+                Pair spawnCHerryCoordinates = _freeSqares[UnityEngine.Random.Range(0, _freeSqares.Count)];
+                cherryPositionX = spawnCHerryCoordinates.X;
+                cherryPositionY = spawnCHerryCoordinates.Y;
+            }
 
             Vector2 position = PositionManager.GetPosition(cherryPositionX, cherryPositionY);
             GameObject g = Instantiate(_cherryPrefab);
             g.transform.localPosition = position;
-
             return (cherryPositionX * Constant.FieldHeight) + cherryPositionY;
         }
 
@@ -68,6 +100,7 @@ namespace Game.View
 
         void IVisualManager.Init(Model.IEventManager eventsManager, float iterationTime)
         {
+            _coinEvent.AddListener(CoinCollected);
             _iterationTime = iterationTime;
 
             eventsManager.Get<Model.IPacManEvents>().OnCreatePacMan += OnCreatePacMan;
@@ -78,9 +111,6 @@ namespace Game.View
 
             eventsManager.Get<Model.IPacManEvents>().OnCreateGhostB += OnCreateGhostB;
             eventsManager.Get<Model.IPacManEvents>().UpdateGhostBPosition += UpdateGhostBPosition;
-
-            int cherryPosition = SpawnCherry();
-            SpawnCoins(cherryPosition);
         }
 
         private void UpdateGhostBPosition(int x, int y)
@@ -125,6 +155,11 @@ namespace Game.View
         public void RotatePacMan(float degrees)
         {
             _degrees = degrees;
+        }
+
+        public void CoinCollected(int x, int y)
+        {
+            _freeSqares.Add(new Pair(x, y));
         }
     }
 }
