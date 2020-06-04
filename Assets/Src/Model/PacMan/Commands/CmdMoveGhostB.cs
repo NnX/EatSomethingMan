@@ -11,11 +11,13 @@ namespace Game.Model
         class CmdMoveGhostB : ICommand
         {
             eDirection _direction = eDirection.RIGHT;
+            bool _isScared = false;
 
             // ========================================
 
-            public CmdMoveGhostB(eDirection direction) {
+            public CmdMoveGhostB(eDirection direction, bool isScared) {
                 _direction = direction;
+                _isScared = isScared;
             }
 
             public void setDirection(eDirection direction)
@@ -28,6 +30,11 @@ namespace Game.Model
             void ICommand.Exec(IContextWritable context)
             {
                 IGhostBWritable ghostB = context.CharactardsContainer.Get<IGhostBWritable>();
+                if(_isScared)
+                {
+                    //TODO CHange skin and behavior
+                    //context.G
+                }
                 bool isCanMove = context.Field.IsCanMove(ghostB.X, ghostB.Y, _direction);
                 while(!isCanMove) 
                 {

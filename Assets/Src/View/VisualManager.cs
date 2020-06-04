@@ -27,6 +27,7 @@ namespace Game.View
         void SpawnCoins(int cherryPosition);
         void RotatePacMan(float degrees);
         int SpawnCherry(bool isInit);
+        void ScareGhosts();
     }
 
     // #################################################
@@ -160,6 +161,12 @@ namespace Game.View
         public void CoinCollected(int x, int y)
         {
             _freeSqares.Add(new Pair(x, y));
+        }
+
+        public void ScareGhosts()
+        {
+            _ghostA.isScared = true;
+            _ghostB.isScared = true;
         }
     }
 }

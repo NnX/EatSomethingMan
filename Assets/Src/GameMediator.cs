@@ -50,8 +50,8 @@ namespace Game
 
                 }
                 _model.Update(current_direction);
-                _model.UpdateGhostA(ghost_direction);
-                _model.UpdateGhostB();
+                _model.UpdateGhostA(ghost_direction, _isCherryConsumed);
+                _model.UpdateGhostB(_isCherryConsumed);
                 yield return new WaitForSeconds(ITERATION_TIME);
  
             }
@@ -108,6 +108,7 @@ namespace Game
             print("[print][GameMediator] Cherry consumed");
             _isCherryConsumed = true;
             dinnerTimestart = Time.realtimeSinceStartup;
+            _visualManager.ScareGhosts();
         }
     }
 }

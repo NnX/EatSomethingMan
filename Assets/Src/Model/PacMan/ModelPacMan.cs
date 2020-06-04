@@ -1,5 +1,4 @@
 using Game.Misc;
-using UnityEngine;
 using UnityEngine.Events;
 namespace Game.Model
 {
@@ -10,9 +9,9 @@ namespace Game.Model
         void Init(UnityEvent cherryEvent);
         void Update(eDirection direction);
         void InitGhostA();
-        void UpdateGhostA(eDirection direction);
+        void UpdateGhostA(eDirection direction, bool isScared);
         void InitGhostB();
-        void UpdateGhostB();
+        void UpdateGhostB(bool isScared);
     }
      
 
@@ -21,11 +20,11 @@ namespace Game.Model
     public partial class ModelPacMan : ModelBase, IModelPacMan
     {
 
+        int DIRECTION_MAX_STEPS = 7;
         ePacmanPosition _ePacmanPosition;
         eDirection _eDirectionGhostB_last;
         eDirection _eDirectionGhostB_current;
         int direction_counter = 0;
-        int DIRECTION_MAX = 7;
         UnityEvent _cherryEvent;
 
         protected override void RegisterEvents(IEventManagerInternal eventManager)
@@ -66,7 +65,7 @@ namespace Game.Model
                 });
         }
 
-        void IModelPacMan.UpdateGhostA(eDirection direction)
+        void IModelPacMan.UpdateGhostA(eDirection direction, bool isScared)
         {
             _ePacmanPosition = ePacmanPosition.DownDown;
             CreateAndExecuteTurn(
@@ -86,12 +85,12 @@ namespace Game.Model
                 });
         }
 
-        void IModelPacMan.UpdateGhostB()
+        void IModelPacMan.UpdateGhostB(bool isScared)
         {
             CreateAndExecuteTurn(
                 (ITurn turn) =>
                 {
-                    CmdMoveGhostB cmdMoveGhostB = new CmdMoveGhostB(_eDirectionGhostB_current);
+                    CmdMoveGhostB cmdMoveGhostB = new CmdMoveGhostB(_eDirectionGhostB_current, isScared);
                     _eDirectionGhostB_last = _eDirectionGhostB_current;
                     _eDirectionGhostB_current = cmdMoveGhostB.getDirection(_eDirectionGhostB_current, _context);
                     if(_eDirectionGhostB_current == _eDirectionGhostB_last)
@@ -101,15 +100,14 @@ namespace Game.Model
                     {
                         direction_counter = 0;
                     }
-                    if (direction_counter == DIRECTION_MAX) // fixed sticking to borders
+
+                    if (direction_counter == DIRECTION_MAX_STEPS) // fixed sticking to borders
                     {
                         while(_eDirectionGhostB_last == _eDirectionGhostB_current)
                         {
                             cmdMoveGhostB.ChangeDirection();
                             _eDirectionGhostB_current = cmdMoveGhostB.getDirection(_eDirectionGhostB_current, _context);
-
                         }
-
                         direction_counter = 0;
                     }
                     turn.Push(cmdMoveGhostB);
