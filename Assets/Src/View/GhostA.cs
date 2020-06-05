@@ -2,12 +2,15 @@ using Game.Misc;
 using UnityEngine;
 using WCTools;
 using UnityEngine.SceneManagement;
+
 namespace Game.View
 { 
     public interface IGhostA
     {
-        void UpdatePosition(Vector2 position, float time);
+        void UpdatePosition(Vector2 position, float time); // TODO make one interface for ghosts
         bool isScared { set; }
+        bool isActive { get;  set; }
+        void UpdateSprite(Sprite sprite);
     }
 
     // #########################################
@@ -15,17 +18,18 @@ namespace Game.View
     public class GhostA : MonoBehaviour, IGhostA
     {
         int CoinCounter = 0;
-        GameObject _objectGhostA;
         bool _isScared;
+        SpriteRenderer _spriteRenderer;
+
         public IGhostA CloneMe(Transform parent, Vector2 position)
         {
-            _objectGhostA = Instantiate(gameObject, parent);
-            BoxCollider2D boxCollider = _objectGhostA.AddComponent<BoxCollider2D>();
+            GameObject _gameObjectGhostA = Instantiate(gameObject, parent);
+            BoxCollider2D boxCollider = _gameObjectGhostA.AddComponent<BoxCollider2D>();
 
-            GhostA ghostA = _objectGhostA.GetComponent<GhostA>();
+            GhostA ghostA = _gameObjectGhostA.GetComponent<GhostA>();
+            _spriteRenderer = _gameObjectGhostA.GetComponent<SpriteRenderer>();
             ghostA.transform.localPosition = position;
 
-                
             return ghostA;
         }
 
@@ -34,6 +38,12 @@ namespace Game.View
         CoroutineInterpolator _positionInterp;
 
         bool IGhostA.isScared { set => _isScared = value; }
+        public bool isActive { get => this.gameObject.activeSelf;  set => this.gameObject.SetActive(value); }
+
+        public void UpdateSprite(Sprite sprite) {
+            SpriteRenderer _spriteRenderer = this.gameObject.GetComponent<SpriteRenderer>();
+            _spriteRenderer.sprite = sprite;
+        }
 
         void Awake()
         {

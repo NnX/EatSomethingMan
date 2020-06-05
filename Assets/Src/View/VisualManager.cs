@@ -41,6 +41,10 @@ namespace Game.View
         [SerializeField]
         PositionManager _positionManager;
 
+        Sprite _cherryGhostSprite;
+        Sprite _GhostASprite;
+        Sprite _GhostBSprite;
+
         float _iterationTime;
         float _degrees = 0;
         IPacMan _pacMan;
@@ -50,6 +54,7 @@ namespace Game.View
         IGhostB _ghostB;
         public CoinCollectedEvent _coinEvent;
         List<Pair> _freeSqares = new List<Pair>();
+
         // =============================================
 
         ICharactersFactory CharactersFactory => _charactersFactory;
@@ -103,6 +108,9 @@ namespace Game.View
         {
             _coinEvent.AddListener(CoinCollected);
             _iterationTime = iterationTime;
+            _cherryGhostSprite = Resources.Load<Sprite>("Sprites/GhostCherry");
+            _GhostASprite = Resources.Load<Sprite>("Sprites/Ghost1");
+            _GhostBSprite = Resources.Load<Sprite>("Sprites/Ghost2");
 
             eventsManager.Get<Model.IPacManEvents>().OnCreatePacMan += OnCreatePacMan;
             eventsManager.Get<Model.IPacManEvents>().OnUpdatePacManPosition += OnUpdatePacManPosition;
@@ -167,6 +175,32 @@ namespace Game.View
         {
             _ghostA.isScared = true;
             _ghostB.isScared = true;
+
+            _ghostA.UpdateSprite(_cherryGhostSprite);
+            _ghostB.UpdateSprite(_cherryGhostSprite);
+        }
+
+        public void ReturnGhostsToNormal()
+        {
+            _ghostA.isScared = false;
+            _ghostB.isScared = false;
+
+            _ghostA.UpdateSprite(_GhostASprite);
+            _ghostB.UpdateSprite(_GhostBSprite);
+        }
+
+        public void ActivateGhosts()
+        {
+            print("Activate ghosts");
+            if(!_ghostA.isActive)
+            {
+                _ghostA.isActive = true;
+            }
+
+            if(!_ghostB.isActive)
+            {
+                _ghostB.isActive = true;
+            }
         }
     }
 }

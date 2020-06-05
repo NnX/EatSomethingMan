@@ -7,8 +7,10 @@ namespace Game.View
 { 
     public interface IGhostB
     {
-        void UpdatePosition(Vector2 position, float time);
+        void UpdatePosition(Vector2 position, float time); // TODO make one interface for ghosts
         bool isScared { set; }
+        bool isActive { get; set; }
+        void UpdateSprite(Sprite sprite);
     }
 
     // #########################################
@@ -17,10 +19,11 @@ namespace Game.View
     {
         int CoinCounter = 0;
         bool _isScared;
-        GameObject _objectGhostB;
+        SpriteRenderer _spriteRenderer;
+
         public IGhostB CloneMe(Transform parent, Vector2 position)
         {
-            _objectGhostB = Instantiate(gameObject, parent);
+            GameObject _objectGhostB = Instantiate(gameObject, parent);
             BoxCollider2D boxCollider = _objectGhostB.AddComponent<BoxCollider2D>();
 
             Rigidbody2D rigid = _objectGhostB.AddComponent<Rigidbody2D>();
@@ -37,6 +40,13 @@ namespace Game.View
         CoroutineInterpolator _positionInterp;
 
         bool IGhostB.isScared { set => _isScared = value; }
+        public bool isActive { get => this.gameObject.activeSelf; set => this.gameObject.SetActive(value); }
+
+        public void UpdateSprite(Sprite sprite)
+        {
+            SpriteRenderer _spriteRenderer = this.gameObject.GetComponent<SpriteRenderer>();
+            _spriteRenderer.sprite = sprite;
+        }
 
         void Awake()
         {

@@ -1005,7 +1005,11 @@ MonoBehaviour:
   _gameObjectsParent: {fileID: 1641078}
   _charactersFactory: {fileID: 611580204}
   _positionManager: {fileID: 340316805}
+  _cherryGhostSprite: {fileID: 21300000, guid: 2f8b4b4e91b67974fab7bf20fbbecd51, type: 3}
   _coinPrefab: {fileID: 6138431501540072113, guid: a3ee55b1f19cfed47ace3580611d51f0,
     type: 3}
   _cherryPrefab: {fileID: 8714537035283569138, guid: 4e2b2cab2f7f0f84fbdfe637685906d0,
     type: 3}
+  _coinEvent:
+    m_PersistentCalls:
+      m_Calls: []
