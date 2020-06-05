@@ -2,12 +2,15 @@ using Game.Misc;
 using UnityEngine;
 using WCTools;
 using UnityEngine.SceneManagement;
+
 namespace Game.View
 { 
     public interface IGhostA
     {
-        void UpdatePosition(Vector2 position, float time);
-        void Rotate(float degrees);
+        void UpdatePosition(Vector2 position, float time); // TODO make one interface for ghosts
+        bool isScared { set; }
+        bool isActive { get;  set; }
+        void UpdateSprite(Sprite sprite);
     }
 
     // #########################################
@@ -15,22 +18,32 @@ namespace Game.View
     public class GhostA : MonoBehaviour, IGhostA
     {
         int CoinCounter = 0;
+        bool _isScared;
+        SpriteRenderer _spriteRenderer;
+
         public IGhostA CloneMe(Transform parent, Vector2 position)
         {
-            GameObject newObj = Instantiate(gameObject, parent);
-            BoxCollider2D boxCollider = newObj.AddComponent<BoxCollider2D>();
+            GameObject _gameObjectGhostA = Instantiate(gameObject, parent);
+            BoxCollider2D boxCollider = _gameObjectGhostA.AddComponent<BoxCollider2D>();
 
-            //Rigidbody2D rigid = newObj.AddComponent<Rigidbody2D>();
-            GhostA ghostA = newObj.GetComponent<GhostA>();
+            GhostA ghostA = _gameObjectGhostA.GetComponent<GhostA>();
+            _spriteRenderer = _gameObjectGhostA.GetComponent<SpriteRenderer>();
             ghostA.transform.localPosition = position;
 
-                
             return ghostA;
         }
 
         // ===================================
 
         CoroutineInterpolator _positionInterp;
+
+        bool IGhostA.isScared { set => _isScared = value; }
+        public bool isActive { get => this.gameObject.activeSelf;  set => this.gameObject.SetActive(value); }
+
+        public void UpdateSprite(Sprite sprite) {
+            SpriteRenderer _spriteRenderer = this.gameObject.GetComponent<SpriteRenderer>();
+            _spriteRenderer.sprite = sprite;
+        }
 
         void Awake()
         {
@@ -41,20 +54,32 @@ namespace Game.View
 
         void IGhostA.UpdatePosition(Vector2 position, float time)
         {
+            if(this.gameObject.activeSelf)
+            {
                 _positionInterp.Interpolate(transform.localPosition, position, time,
                     (Vector2 pos) =>
                     {
                         transform.localPosition = pos;
                     });
+            }
         }
 
         void OnTriggerEnter2D(Collider2D other)
         {
-            Debug.Log("IGhostA trigger = " + other.name);
+
             if (other.name.Equals("PacMan(Clone)"))
             {
+                if (_isScared)
+                {
+                    print("[GhostA] Om nom nom");
+                    this.gameObject.SetActive(false);
+                }
+                else
+                {
                     Debug.Log("IGhostA Haha, GAME OVER!!!");
-                SceneManager.LoadScene("lost", LoadSceneMode.Single);
+                    SceneManager.LoadScene("lost", LoadSceneMode.Single);
+
+                }
             }
         }
 

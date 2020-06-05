@@ -9,14 +9,18 @@ namespace Game
     public class GameMediator : MonoBehaviour
     {
         public const int FIELD_WIDTH = 16;
+        public const float DINNER_TIME = 5f;
+        public const float ACTIVATE_GHOST_TIME = 10f;
         const float ITERATION_TIME = 0.5f;
         eDirection current_direction = eDirection.RIGHT;
         eDirection ghost_direction = eDirection.DOWN;
         [SerializeField]
         View.VisualManager _visualManager;
 
-        IModelPacMan _model = new ModelPacMan();
         public UnityEvent _cherryEvent = new UnityEvent();
+        IModelPacMan _model = new ModelPacMan();
+        bool _isCherryConsumed = false;
+        float _dinnerTimestart; // TODO fix reset activate ghost timer if cherry is eaten again? Bug or feature?
         // ====================================
 
         View.IVisualManager VisualManager => _visualManager;
@@ -30,11 +34,32 @@ namespace Game
             _model.Init(_cherryEvent);
             _model.InitGhostA();
             _model.InitGhostB();
+
+            int cherryPosition = _visualManager.SpawnCherry(true);
+            _visualManager.SpawnCoins(cherryPosition);
+
             while (true)
             {
+                if(_isCherryConsumed)
+                {
+                    float elapsedTime = Time.realtimeSinceStartup - _dinnerTimestart;
+                    if (elapsedTime > DINNER_TIME)
+                    {
+                        _isCherryConsumed = false;
+                        _visualManager.SpawnCherry(false);
+                        _visualManager.ReturnGhostsToNormal();
+                    }
+
+                }
+
+                if(_dinnerTimestart > 0 && (Time.realtimeSinceStartup - _dinnerTimestart > ACTIVATE_GHOST_TIME))
+                {
+                    _visualManager.ActivateGhosts();
+                    _dinnerTimestart = 0;
+                }
                 _model.Update(current_direction);
-                _model.UpdateGhostA(ghost_direction);
-                _model.UpdateGhostB();
+                _model.UpdateGhostA(ghost_direction, _isCherryConsumed);
+                _model.UpdateGhostB(_isCherryConsumed);
                 yield return new WaitForSeconds(ITERATION_TIME);
  
             }
@@ -89,6 +114,9 @@ namespace Game
         public void CherryConsumed()
         {
             print("[print][GameMediator] Cherry consumed");
+            _isCherryConsumed = true;
+            _dinnerTimestart = Time.realtimeSinceStartup;
+            _visualManager.ScareGhosts();
         }
     }
 }
