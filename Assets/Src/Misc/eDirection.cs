@@ -98,6 +98,63 @@ namespace Game.Misc
             return parts;
         }
 
+        public static List<eDirection> RunFromPacman(ePacmanPosition pacmanPosition)
+        {
+            List<eDirection> parts = new List<eDirection>();
+
+            if (pacmanPosition == ePacmanPosition.UpUp) // upup // 1
+            {
+                parts.Add(eDirection.DOWN);
+                parts.Add(eDirection.LEFT);
+                parts.Add(eDirection.RIGHT);
+            }
+            else if (pacmanPosition == ePacmanPosition.UpRight)    //up right // 2
+            {
+                parts.Add(eDirection.DOWN);
+                parts.Add(eDirection.LEFT);
+                parts.Add(eDirection.RIGHT);
+            }
+            else if (pacmanPosition == ePacmanPosition.RightRight) // right right // 3
+            {
+                parts.Add(eDirection.LEFT);
+                parts.Add(eDirection.UP);
+                parts.Add(eDirection.DOWN);
+            }
+            else if (pacmanPosition == ePacmanPosition.RightDown) // right down // 4
+            {
+                parts.Add(eDirection.LEFT);
+                parts.Add(eDirection.UP);
+                parts.Add(eDirection.RIGHT);
+            }
+            else if (pacmanPosition == ePacmanPosition.DownDown)    //down down // 5
+            {
+                parts.Add(eDirection.UP);
+                parts.Add(eDirection.RIGHT);
+                parts.Add(eDirection.LEFT);
+            }
+            else if (pacmanPosition == ePacmanPosition.DownLeft) // down left // 6
+            {
+                parts.Add(eDirection.UP);
+                parts.Add(eDirection.RIGHT);
+                parts.Add(eDirection.LEFT);
+            }
+            else if (pacmanPosition == ePacmanPosition.LeftLeft) // left left // 7
+            {
+                parts.Add(eDirection.RIGHT);
+                parts.Add(eDirection.DOWN);
+                parts.Add(eDirection.UP);
+            }
+            else if (pacmanPosition == ePacmanPosition.LeftUp) // left up // 8
+            {
+                parts.Add(eDirection.DOWN);
+                parts.Add(eDirection.RIGHT);
+                parts.Add(eDirection.LEFT);
+            }
+
+
+            return parts;
+        }
+
         public static ePacmanPosition getPacmanPosition(int pacman_x, int pacman_y, int ghost_x, int ghost_y)
         {
             ePacmanPosition pacmanPosition = ePacmanPosition.DownLeft;
