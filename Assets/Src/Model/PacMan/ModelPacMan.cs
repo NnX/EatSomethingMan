@@ -71,7 +71,7 @@ namespace Game.Model
             CreateAndExecuteTurn(
                 (ITurn turn) =>
                 {
-                    CmdMoveGhostA cmdMoveGhostA = new CmdMoveGhostA(direction, _ePacmanPosition);
+                    CmdMoveGhostA cmdMoveGhostA = new CmdMoveGhostA(direction, _ePacmanPosition, isScared);
                     turn.Push(cmdMoveGhostA);
                 });
         }
@@ -91,24 +91,28 @@ namespace Game.Model
                 (ITurn turn) =>
                 {
                     CmdMoveGhostB cmdMoveGhostB = new CmdMoveGhostB(_eDirectionGhostB_current, isScared);
-                    _eDirectionGhostB_last = _eDirectionGhostB_current;
-                    _eDirectionGhostB_current = cmdMoveGhostB.getDirection(_eDirectionGhostB_current, _context);
-                    if(_eDirectionGhostB_current == _eDirectionGhostB_last)
+                    if (!isScared)
                     {
-                        direction_counter++;
-                    } else
-                    {
-                        direction_counter = 0;
-                    }
+                        _eDirectionGhostB_last = _eDirectionGhostB_current;
+                        _eDirectionGhostB_current = cmdMoveGhostB.getDirection(_eDirectionGhostB_current, _context);
 
-                    if (direction_counter == DIRECTION_MAX_STEPS) // fixed sticking to borders
-                    {
-                        while(_eDirectionGhostB_last == _eDirectionGhostB_current)
+                        if(_eDirectionGhostB_current == _eDirectionGhostB_last)
                         {
-                            cmdMoveGhostB.ChangeDirection();
-                            _eDirectionGhostB_current = cmdMoveGhostB.getDirection(_eDirectionGhostB_current, _context);
+                            direction_counter++;
+                        } else
+                        {
+                            direction_counter = 0;
                         }
-                        direction_counter = 0;
+
+                        if (direction_counter == DIRECTION_MAX_STEPS) // fixed sticking to borders
+                        {
+                            while(_eDirectionGhostB_last == _eDirectionGhostB_current)
+                            {
+                                cmdMoveGhostB.ChangeDirection();
+                                _eDirectionGhostB_current = cmdMoveGhostB.getDirection(_eDirectionGhostB_current, _context);
+                            }
+                            direction_counter = 0;
+                        }
                     }
                     turn.Push(cmdMoveGhostB);
                 });

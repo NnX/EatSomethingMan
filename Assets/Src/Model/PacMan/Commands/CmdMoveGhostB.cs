@@ -1,8 +1,5 @@
 using Game.Misc;
-using System;
 using System.Collections.Generic;
-using UnityEngine;
-using System.Collections;
 
 namespace Game.Model
 {
@@ -32,14 +29,28 @@ namespace Game.Model
                 IGhostBWritable ghostB = context.CharactardsContainer.Get<IGhostBWritable>();
                 if(_isScared)
                 {
-                    //TODO CHange skin and behavior
-                    //context.G
-                }
-                bool isCanMove = context.Field.IsCanMove(ghostB.X, ghostB.Y, _direction);
-                while(!isCanMove) 
+                    IPacManWritable pacman = context.CharactardsContainer.Get<IPacManWritable>();
+
+                    ePacmanPosition pacmanPosition = Direction.getPacmanPosition(pacman.X, pacman.Y, ghostB.X, ghostB.Y);
+                    List<eDirection> directions = Direction.RunFromPacman(pacmanPosition);
+
+                    foreach (eDirection direction in directions)
+                    {
+                        if (context.Field.IsCanMove(ghostB.X, ghostB.Y, direction))
+                        {
+                            _direction = direction;
+                            break;
+                        }
+                    }
+                } else
                 {
-                    ChangeDirection();
-                    isCanMove = context.Field.IsCanMove(ghostB.X, ghostB.Y, _direction);
+
+                    bool isCanMove = context.Field.IsCanMove(ghostB.X, ghostB.Y, _direction);
+                    while(!isCanMove) 
+                    {
+                        ChangeDirection();
+                        isCanMove = context.Field.IsCanMove(ghostB.X, ghostB.Y, _direction);
+                    }
                 }
                 
                 (int x, int y) nextPositon = Direction.GetNextPosition(ghostB.X, ghostB.Y, _direction);

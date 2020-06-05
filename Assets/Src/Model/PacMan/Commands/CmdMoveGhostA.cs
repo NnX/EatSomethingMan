@@ -9,12 +9,19 @@ namespace Game.Model
         {
             eDirection _direction;
             ePacmanPosition _pacmanPosition;
+            bool _isScared = false;
 
             // ========================================
 
-            public CmdMoveGhostA(eDirection direction, ePacmanPosition pacmanPosition) {               
+            public CmdMoveGhostA(eDirection direction, ePacmanPosition pacmanPosition, bool isScared) {               
                 _direction = direction;
                 _pacmanPosition = pacmanPosition;
+                _isScared = isScared;
+            }
+
+            public void setDirection(eDirection direction)
+            {
+                _direction = direction;
             }
 
             // ============== ICommand ================
@@ -39,7 +46,15 @@ namespace Game.Model
                     IPacManWritable pacman = context.CharactardsContainer.Get<IPacManWritable>();
 
                     ePacmanPosition pacmanPosition = Direction.getPacmanPosition(pacman.X, pacman.Y, ghostA.X, ghostA.Y);
-                    List<eDirection> directions = Direction.FindPacman(pacmanPosition);
+                    List<eDirection> directions = new List<eDirection>();
+
+                    if(_isScared)
+                    {
+                        directions = Direction.RunFromPacman(pacmanPosition);
+                    } else
+                    {
+                        directions = Direction.FindPacman(pacmanPosition);
+                    }
                     foreach (eDirection direction in directions)
                     {
                         if (context.Field.IsCanMove(ghostA.X, ghostA.Y, direction))

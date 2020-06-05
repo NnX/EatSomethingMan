@@ -124,8 +124,11 @@ namespace Game.View
 
         private void UpdateGhostBPosition(int x, int y)
         {
-            Vector2 position = PositionManager.GetPosition(x, y);
-            _ghostB.UpdatePosition(position, _iterationTime);
+            if(_ghostB.isActive)
+            {
+                Vector2 position = PositionManager.GetPosition(x, y);
+                _ghostB.UpdatePosition(position, _iterationTime);
+            }
         }
 
         private void OnCreateGhostB(int x, int y)
@@ -136,8 +139,11 @@ namespace Game.View
 
         private void UpdateGhostAPosition(int x, int y)
         {
-            Vector2 position = PositionManager.GetPosition(x, y);
-            _ghostA.UpdatePosition(position, _iterationTime);
+            if(_ghostA.isActive)
+            {
+                Vector2 position = PositionManager.GetPosition(x, y);
+                _ghostA.UpdatePosition(position, _iterationTime);
+            }
         }
 
         private void OnCreateGhostA(int x, int y)
@@ -191,7 +197,6 @@ namespace Game.View
 
         public void ActivateGhosts()
         {
-            print("Activate ghosts");
             if(!_ghostA.isActive)
             {
                 _ghostA.isActive = true;
