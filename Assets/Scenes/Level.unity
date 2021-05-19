@@ -185,7 +185,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _visualManager: {fileID: 2067067744}
-  plaerSelectionMenu: {fileID: 1449900650}
+  playerSelectionMenu: {fileID: 1449900650}
   _cherryEvent:
     m_PersistentCalls:
       m_Calls: []
