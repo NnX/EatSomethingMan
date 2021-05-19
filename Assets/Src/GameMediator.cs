@@ -9,13 +9,13 @@ namespace Game
     public class GameMediator : MonoBehaviour
     {
         public const int FIELD_WIDTH = 16;
-        public const float DINNER_TIME = 5f;
+        public const float DINNER_TIME = 5125f;
         public const float ACTIVATE_GHOST_TIME = 10f;
         const float ITERATION_TIME = 0.5f;
         eDirection current_direction = eDirection.RIGHT;
         eDirection ghost_direction = eDirection.DOWN;
-        [SerializeField]
-        View.VisualManager _visualManager;
+        [SerializeField] View.VisualManager _visualManager;
+        [SerializeField] GameObject playerSelectionMenu;
 
         public UnityEvent _cherryEvent = new UnityEvent();
         IModelPacMan _model = new ModelPacMan();
@@ -29,6 +29,7 @@ namespace Game
 
         IEnumerator Start()
         {
+            Time.timeScale = 0;
             VisualManager.Init(_model.EventManager, ITERATION_TIME);
             _cherryEvent.AddListener(CherryConsumed);
             _model.Init(_cherryEvent);
@@ -36,6 +37,7 @@ namespace Game
             _model.InitGhostB();
 
             int cherryPosition = _visualManager.SpawnCherry(true);
+            //int cherryPosition = -1;
             _visualManager.SpawnCoins(cherryPosition);
 
             while (true)
@@ -117,6 +119,13 @@ namespace Game
             _isCherryConsumed = true;
             _dinnerTimestart = Time.realtimeSinceStartup;
             _visualManager.ScareGhosts();
+        }
+
+        public void OnPlayerSelectionClick(int playersAmount)
+        {
+            Time.timeScale = 1f;
+            playerSelectionMenu.SetActive(false);
+
         }
     }
 }
