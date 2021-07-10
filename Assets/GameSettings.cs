@@ -6,4 +6,5 @@ public class GameSettings : MonoBehaviour
 {
 
     [SerializeField] GameObject seetings;
+    //Some test data
 }
