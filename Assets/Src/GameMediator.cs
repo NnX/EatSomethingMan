@@ -9,7 +9,7 @@ namespace Game
     public class GameMediator : MonoBehaviour
     {
         public const int FIELD_WIDTH = 16;
-        public const float DINNER_TIME = 5125f;
+        public const float DINNER_TIME = 5f;
         public const float ACTIVATE_GHOST_TIME = 10f;
         const float ITERATION_TIME = 0.5f;
         eDirection current_direction = eDirection.RIGHT;
@@ -36,7 +36,8 @@ namespace Game
             _model.InitGhostA();
             _model.InitGhostB();
 
-            int cherryPosition = _visualManager.SpawnCherry(true);
+            //int cherryPosition = _visualManager.SpawnCherry(true);
+            int cherryPosition = -1;
             //int cherryPosition = -1;
             _visualManager.SpawnCoins(cherryPosition);
 
@@ -124,8 +125,8 @@ namespace Game
         public void OnPlayerSelectionClick(int playersAmount)
         {
             Time.timeScale = 1f;
+            Constant.IsTwoPlayers = playersAmount == 2;
             playerSelectionMenu.SetActive(false);
-
         }
     }
 }
