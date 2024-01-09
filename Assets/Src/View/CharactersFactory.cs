@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
-namespace Game.View
+
+namespace Src.View
 { 
     public interface ICharactersFactory
     {
@@ -13,22 +14,25 @@ namespace Game.View
 
     public class CharactersFactory : MonoBehaviour, ICharactersFactory
     {
-        [SerializeField]
-        PacMan _pacManPrefab;
-        [SerializeField]
-        GhostA _ghostAPrefab;
-        [SerializeField]
-        GhostB _ghostBPrefab;
+        [SerializeField] private PacMan pacManPrefab;
+        [SerializeField] private GhostA ghostAPrefab;
+        [SerializeField] private GhostB ghostBPrefab;
 
         // ========== ICharactersFactory ============
 
         IPacMan ICharactersFactory.CreatePacMan(Transform parentTransform, Vector2 position, UnityEvent unityEvent)
-        { return _pacManPrefab.CloneMe(parentTransform, position, unityEvent); }
+        {
+            return pacManPrefab.CloneMe(parentTransform, position, unityEvent);
+        }
 
         IGhostA ICharactersFactory.CreateGhostA(Transform parentTransform, Vector2 position)
-        { return _ghostAPrefab.CloneMe(parentTransform, position); }
+        {
+            return ghostAPrefab.CloneMe(parentTransform, position);
+        }
 
         IGhostB ICharactersFactory.CreateGhostB(Transform parentTransform, Vector2 position)
-        { return _ghostBPrefab.CloneMe(parentTransform, position); }
+        {
+            return ghostBPrefab.CloneMe(parentTransform, position);
+        }
     }
 }

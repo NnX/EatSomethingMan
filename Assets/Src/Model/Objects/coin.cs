@@ -1,22 +1,21 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Src.View;
 using UnityEngine;
-using UnityEngine.Events;
-using Game.View;
 
-public class coin : MonoBehaviour
+namespace Src.Model.Objects
 {
-    public int X { get; set; }
-    public int Y { get; set; } 
-    public CoinCollectedEvent _coinEvent;
-    
-
-    void OnTriggerEnter2D(Collider2D other)
+    public class Coin : MonoBehaviour
     {
-        if (other.name.Equals("PacMan(Clone)"))
+        public int X { get; set; }
+        public int Y { get; set; } 
+        public CoinCollectedEvent coinEvent;
+
+        private void OnTriggerEnter2D(Collider2D other)
         {
-            _coinEvent.Invoke(X,Y);
-            Destroy(this.gameObject);
-        }
-    } 
+            if (other.TryGetComponent<PacMan>(out _))
+            {
+                coinEvent.Invoke(X,Y);
+                Destroy(gameObject); 
+            }
+        } 
+    }
 }

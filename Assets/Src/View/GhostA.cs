@@ -1,15 +1,14 @@
-using Game.Misc;
 using UnityEngine;
-using WCTools;
 using UnityEngine.SceneManagement;
+using WCTools;
 
-namespace Game.View
+namespace Src.View
 { 
     public interface IGhostA
     {
         void UpdatePosition(Vector2 position, float time); // TODO make one interface for ghosts
-        bool isScared { set; }
-        bool isActive { get;  set; }
+        bool IsScared { set; }
+        bool IsActive { get;  set; }
         void UpdateSprite(Sprite sprite);
     }
 
@@ -17,35 +16,44 @@ namespace Game.View
 
     public class GhostA : MonoBehaviour, IGhostA
     {
-        int CoinCounter = 0;
-        bool _isScared;
-        SpriteRenderer _spriteRenderer;
+        /*private int _coinCounter = 0;*/
+        private bool _isScared;
+        /*private SpriteRenderer _spriteRenderer;*/
 
         public IGhostA CloneMe(Transform parent, Vector2 position)
         {
-            GameObject _gameObjectGhostA = Instantiate(gameObject, parent);
-            BoxCollider2D boxCollider = _gameObjectGhostA.AddComponent<BoxCollider2D>();
+            var gameObjectGhostA = Instantiate(gameObject, parent).AddComponent<BoxCollider2D>();
 
-            GhostA ghostA = _gameObjectGhostA.GetComponent<GhostA>();
-            _spriteRenderer = _gameObjectGhostA.GetComponent<SpriteRenderer>();
-            ghostA.transform.localPosition = position;
+            if(gameObjectGhostA.TryGetComponent<GhostA>(out var ghostA))
+            {
+                ghostA.transform.localPosition = position;  
+            }
+            /*if(gameObjectGhostA.TryGetComponent<SpriteRenderer>(out var spriteRenderer))
+            {
+                _spriteRenderer = spriteRenderer;
+            }*/
 
             return ghostA;
         }
 
         // ===================================
 
-        CoroutineInterpolator _positionInterp;
+        private CoroutineInterpolator _positionInterp;
 
-        bool IGhostA.isScared { set => _isScared = value; }
-        public bool isActive { get => this.gameObject.activeSelf;  set => this.gameObject.SetActive(value); }
+        bool IGhostA.IsScared { set => _isScared = value; }
+        public bool IsActive { get => gameObject.activeSelf;  set => gameObject.SetActive(value); }
 
-        public void UpdateSprite(Sprite sprite) {
-            SpriteRenderer _spriteRenderer = this.gameObject.GetComponent<SpriteRenderer>();
-            _spriteRenderer.sprite = sprite;
+        public void UpdateSprite(Sprite sprite)
+        {
+            if (gameObject.TryGetComponent<SpriteRenderer>(out var spriteRenderer))
+            {
+                
+                spriteRenderer.sprite = sprite;
+            }
+            //_spriteRenderer = spriteRenderer;
         }
 
-        void Awake()
+        private void Awake()
         {
             _positionInterp = new CoroutineInterpolator(this);
         }
@@ -54,7 +62,7 @@ namespace Game.View
 
         void IGhostA.UpdatePosition(Vector2 position, float time)
         {
-            if(this.gameObject.activeSelf)
+            if(gameObject.activeSelf)
             {
                 _positionInterp.Interpolate(transform.localPosition, position, time,
                     (Vector2 pos) =>
@@ -64,7 +72,7 @@ namespace Game.View
             }
         }
 
-        void OnTriggerEnter2D(Collider2D other)
+        private void OnTriggerEnter2D(Collider2D other)
         {
 
             if (other.name.Equals("PacMan(Clone)"))
@@ -72,7 +80,7 @@ namespace Game.View
                 if (_isScared)
                 {
                     print("[GhostA] Om nom nom");
-                    this.gameObject.SetActive(false);
+                    gameObject.SetActive(false);
                 }
                 else
                 {

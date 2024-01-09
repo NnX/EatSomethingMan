@@ -1,12 +1,15 @@
 ﻿using UnityEngine;
 
-public class cherry : MonoBehaviour
+namespace Src.Model.Objects
 {
-    void OnTriggerEnter2D(Collider2D other)
+    public class Cherry : MonoBehaviour
     {
-        if (other.name.Equals("PacMan(Clone)"))
+        private void OnTriggerEnter2D(Collider2D other)
         {
-            Destroy(this.gameObject);
+            if (other.name.Equals("PacMan(Clone)"))
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }

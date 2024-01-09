@@ -1,13 +1,12 @@
+using System.Collections.Generic;
+using Src.Model.Objects;
 using UnityEngine;
 using UnityEngine.Events;
-using System.Collections.Generic;
 
-namespace Game.View
+namespace Src.View
 {
     [System.Serializable]
-    public class CoinCollectedEvent : UnityEvent<int, int>
-    {
-    }
+    public class CoinCollectedEvent : UnityEvent<int, int>{}
 
     public class Pair {
         public int X { get; set; }
@@ -20,10 +19,9 @@ namespace Game.View
         }
     }
 
-
     public interface IVisualManager
     {
-        void Init(Model.IEventManager eventsManager, float iterationTime);
+        void Init(Game.Model.IEventManager eventsManager, float iterationTime);
         void SpawnCoins(int cherryPosition);
         void RotatePacMan(float degrees);
         int SpawnCherry(bool isInit);
@@ -31,29 +29,25 @@ namespace Game.View
     }
 
     // #################################################
-
     public class VisualManager : MonoBehaviour, IVisualManager
     {
-        [SerializeField]
-        Transform _gameObjectsParent;
-        [SerializeField]
-        CharactersFactory _charactersFactory;
-        [SerializeField]
-        PositionManager _positionManager;
+        [SerializeField] Transform _gameObjectsParent;
+        [SerializeField] CharactersFactory _charactersFactory;
+        [SerializeField] PositionManager _positionManager;
 
-        Sprite _cherryGhostSprite;
-        Sprite _GhostASprite;
-        Sprite _GhostBSprite;
-
-        float _iterationTime;
-        float _degrees = 0;
-        IPacMan _pacMan;
         public GameObject _coinPrefab;
         public GameObject _cherryPrefab;
-        IGhostA _ghostA;
-        IGhostB _ghostB;
         public CoinCollectedEvent _coinEvent;
-        List<Pair> _freeSqares = new List<Pair>();
+        
+        private Sprite _cherryGhostSprite;
+        private Sprite _GhostASprite;
+        private Sprite _GhostBSprite;
+        private float _iterationTime;
+        private float _degrees = 0;
+        private IPacMan _pacMan;
+        private IGhostA _ghostA;
+        private IGhostB _ghostB;
+        private readonly List<Pair> _freeSquares = new();
 
         // =============================================
 
@@ -62,16 +56,16 @@ namespace Game.View
 
         public void SpawnCoins(int cherryPosition)
         {
-            for (int x = 0; x < Constant.FieldWidth; x++)
+            for (var x = 0; x < Constant.FieldWidth; x++)
             {
-                for (int y = 0; y < Constant.FieldHeight; y++)
+                for (var y = 0; y < Constant.FieldHeight; y++)
                 {
                     if(((x * Constant.FieldHeight) + y) != cherryPosition)
                     {
-                        Vector2 position = PositionManager.GetPosition(x, y);
-                        GameObject c = Instantiate(_coinPrefab) as GameObject;
-                        coin bitcoin = c.GetComponent<coin>();
-                        bitcoin._coinEvent = _coinEvent;
+                        var position = PositionManager.GetPosition(x, y);
+                        var c = Instantiate(_coinPrefab) as GameObject;
+                        var bitcoin = c.GetComponent<Coin>();
+                        bitcoin.coinEvent = _coinEvent;
                         bitcoin.X = x;
                         bitcoin.Y = y;
                         c.transform.localPosition = position;
@@ -82,29 +76,29 @@ namespace Game.View
 
         public int SpawnCherry(bool isInit)
         {
-            int cherryPositionX = 0;
-            int cherryPositionY = 0;
+            int cherryPositionX;
+            int cherryPositionY;
             if(isInit)
             {
-                cherryPositionX = UnityEngine.Random.Range(Constant.FieldWidth / 2, Constant.FieldWidth - 1);
-                cherryPositionY = UnityEngine.Random.Range(Constant.FieldHeight / 2, Constant.FieldHeight - 1);
+                cherryPositionX = Random.Range(Constant.FieldWidth / 2, Constant.FieldWidth - 1);
+                cherryPositionY = Random.Range(Constant.FieldHeight / 2, Constant.FieldHeight - 1);
 
             } else
             {
-                Pair spawnCHerryCoordinates = _freeSqares[UnityEngine.Random.Range(0, _freeSqares.Count)];
-                cherryPositionX = spawnCHerryCoordinates.X;
-                cherryPositionY = spawnCHerryCoordinates.Y;
+                var spawnCherryCoordinates = _freeSquares[Random.Range(0, _freeSquares.Count)];
+                cherryPositionX = spawnCherryCoordinates.X;
+                cherryPositionY = spawnCherryCoordinates.Y;
             }
 
-            Vector2 position = PositionManager.GetPosition(cherryPositionX, cherryPositionY);
-            GameObject g = Instantiate(_cherryPrefab);
+            var position = PositionManager.GetPosition(cherryPositionX, cherryPositionY);
+            var g = Instantiate(_cherryPrefab);
             g.transform.localPosition = position;
             return (cherryPositionX * Constant.FieldHeight) + cherryPositionY;
         }
 
         // ============ IVisualManager =================
 
-        void IVisualManager.Init(Model.IEventManager eventsManager, float iterationTime)
+        void IVisualManager.Init(Game.Model.IEventManager eventsManager, float iterationTime)
         {
             _coinEvent.AddListener(CoinCollected);
             _iterationTime = iterationTime;
@@ -112,57 +106,57 @@ namespace Game.View
             _GhostASprite = Resources.Load<Sprite>("Sprites/Ghost1");
             _GhostBSprite = Resources.Load<Sprite>("Sprites/Ghost2");
 
-            eventsManager.Get<Model.IPacManEvents>().OnCreatePacMan += OnCreatePacMan;
-            eventsManager.Get<Model.IPacManEvents>().OnUpdatePacManPosition += OnUpdatePacManPosition;
+            eventsManager.Get<Game.Model.IPacManEvents>().OnCreatePacMan += OnCreatePacMan;
+            eventsManager.Get<Game.Model.IPacManEvents>().OnUpdatePacManPosition += OnUpdatePacManPosition;
 
-            eventsManager.Get<Model.IPacManEvents>().OnCreateGhostA += OnCreateGhostA;
-            eventsManager.Get<Model.IPacManEvents>().UpdateGhostAPosition += UpdateGhostAPosition;
+            eventsManager.Get<Game.Model.IPacManEvents>().OnCreateGhostA += OnCreateGhostA;
+            eventsManager.Get<Game.Model.IPacManEvents>().UpdateGhostAPosition += UpdateGhostAPosition;
 
-            eventsManager.Get<Model.IPacManEvents>().OnCreateGhostB += OnCreateGhostB;
-            eventsManager.Get<Model.IPacManEvents>().UpdateGhostBPosition += UpdateGhostBPosition;
+            eventsManager.Get<Game.Model.IPacManEvents>().OnCreateGhostB += OnCreateGhostB;
+            eventsManager.Get<Game.Model.IPacManEvents>().UpdateGhostBPosition += UpdateGhostBPosition;
         }
 
         private void UpdateGhostBPosition(int x, int y)
         {
-            if(_ghostB.isActive)
+            if(_ghostB.IsActive)
             {
-                Vector2 position = PositionManager.GetPosition(x, y);
+                var position = PositionManager.GetPosition(x, y);
                 _ghostB.UpdatePosition(position, _iterationTime);
             }
         }
 
         private void OnCreateGhostB(int x, int y)
         {
-            Vector2 position = PositionManager.GetPosition(x, y);
+            var position = PositionManager.GetPosition(x, y);
             _ghostB = CharactersFactory.CreateGhostB(_gameObjectsParent, position);
         }
 
         private void UpdateGhostAPosition(int x, int y)
         {
-            if(_ghostA.isActive)
+            if(_ghostA.IsActive)
             {
-                Vector2 position = PositionManager.GetPosition(x, y);
+                var position = PositionManager.GetPosition(x, y);
                 _ghostA.UpdatePosition(position, _iterationTime);
             }
         }
 
         private void OnCreateGhostA(int x, int y)
         {
-            Vector2 position = PositionManager.GetPosition(x, y);
+            var position = PositionManager.GetPosition(x, y);
             _ghostA = CharactersFactory.CreateGhostA(_gameObjectsParent, position);
         }
 
         // =============================================
 
-        void OnCreatePacMan(int x, int y, UnityEvent unityEvent)
+        private void OnCreatePacMan(int x, int y, UnityEvent unityEvent)
         {
-            Vector2 position = PositionManager.GetPosition(x, y);
+            var position = PositionManager.GetPosition(x, y);
             _pacMan = CharactersFactory.CreatePacMan(_gameObjectsParent, position, unityEvent);
         }
 
         void OnUpdatePacManPosition(int x, int y)
         {
-            Vector2 position = PositionManager.GetPosition(x, y);
+            var position = PositionManager.GetPosition(x, y);
             _pacMan.UpdatePosition(position, _iterationTime);
             _pacMan.Rotate(_degrees);
         }
@@ -172,15 +166,15 @@ namespace Game.View
             _degrees = degrees;
         }
 
-        public void CoinCollected(int x, int y)
+        private void CoinCollected(int x, int y)
         {
-            _freeSqares.Add(new Pair(x, y));
+            _freeSquares.Add(new Pair(x, y));
         }
 
         public void ScareGhosts()
         {
-            _ghostA.isScared = true;
-            _ghostB.isScared = true;
+            _ghostA.IsScared = true;
+            _ghostB.IsScared = true;
 
             _ghostA.UpdateSprite(_cherryGhostSprite);
             _ghostB.UpdateSprite(_cherryGhostSprite);
@@ -188,8 +182,8 @@ namespace Game.View
 
         public void ReturnGhostsToNormal()
         {
-            _ghostA.isScared = false;
-            _ghostB.isScared = false;
+            _ghostA.IsScared = false;
+            _ghostB.IsScared = false;
 
             _ghostA.UpdateSprite(_GhostASprite);
             _ghostB.UpdateSprite(_GhostBSprite);
@@ -197,14 +191,14 @@ namespace Game.View
 
         public void ActivateGhosts()
         {
-            if(!_ghostA.isActive)
+            if(!_ghostA.IsActive)
             {
-                _ghostA.isActive = true;
+                _ghostA.IsActive = true;
             }
 
-            if(!_ghostB.isActive)
+            if(!_ghostB.IsActive)
             {
-                _ghostB.isActive = true;
+                _ghostB.IsActive = true;
             }
         }
     }

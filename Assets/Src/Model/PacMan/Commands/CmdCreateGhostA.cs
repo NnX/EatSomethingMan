@@ -1,5 +1,3 @@
-using Game.Misc;
-
 namespace Game.Model
 {
     public partial class ModelPacMan

@@ -1,43 +1,45 @@
 using System.Collections;
+using Game.Misc;
+using Game.Model;
+using Src.View;
 using UnityEngine;
 using UnityEngine.Events;
-using Game.Model;
-using Game.Misc;
 
-namespace Game
+namespace Src
 {
     public class GameMediator : MonoBehaviour
     {
-        public const int FIELD_WIDTH = 16;
-        public const float DINNER_TIME = 5f;
-        public const float ACTIVATE_GHOST_TIME = 10f;
-        const float ITERATION_TIME = 0.5f;
-        eDirection current_direction = eDirection.RIGHT;
-        eDirection ghost_direction = eDirection.DOWN;
-        [SerializeField] View.VisualManager _visualManager;
+        public const int FieldWidth = 16;
+        private const float DinnerTime = 5f;
+        private const float ActivateGhostTime = 10f;
+        private const float IterationTime = 0.5f;
+
+        [SerializeField] VisualManager _visualManager;
         [SerializeField] GameObject playerSelectionMenu;
 
         public UnityEvent _cherryEvent = new UnityEvent();
-        IModelPacMan _model = new ModelPacMan();
-        bool _isCherryConsumed = false;
-        float _dinnerTimestart; // TODO fix reset activate ghost timer if cherry is eaten again? Bug or feature?
+        private eDirection _currentDirection = eDirection.RIGHT;
+        private eDirection _ghostDirection = eDirection.DOWN;
+        private readonly IModelPacMan _model = new ModelPacMan();
+        private bool _isCherryConsumed;
+        private float _dinnerTimeStart; // TODO fix reset activate ghost timer if cherry is eaten again? Bug or feature?
         // ====================================
 
-        View.IVisualManager VisualManager => _visualManager;
+        IVisualManager VisualManager => _visualManager;
 
         // ====================================
 
-        IEnumerator Start()
+        private IEnumerator Start()
         {
             Time.timeScale = 0;
-            VisualManager.Init(_model.EventManager, ITERATION_TIME);
+            VisualManager.Init(_model.EventManager, IterationTime);
             _cherryEvent.AddListener(CherryConsumed);
             _model.Init(_cherryEvent);
             _model.InitGhostA();
             _model.InitGhostB();
 
             //int cherryPosition = _visualManager.SpawnCherry(true);
-            int cherryPosition = -1;
+            const int cherryPosition = -1;
             //int cherryPosition = -1;
             _visualManager.SpawnCoins(cherryPosition);
 
@@ -45,8 +47,8 @@ namespace Game
             {
                 if(_isCherryConsumed)
                 {
-                    float elapsedTime = Time.realtimeSinceStartup - _dinnerTimestart;
-                    if (elapsedTime > DINNER_TIME)
+                    var elapsedTime = Time.realtimeSinceStartup - _dinnerTimeStart;
+                    if (elapsedTime > DinnerTime)
                     {
                         _isCherryConsumed = false;
                         _visualManager.SpawnCherry(false);
@@ -55,70 +57,70 @@ namespace Game
 
                 }
 
-                if(_dinnerTimestart > 0 && (Time.realtimeSinceStartup - _dinnerTimestart > ACTIVATE_GHOST_TIME))
+                if(_dinnerTimeStart > 0 && (Time.realtimeSinceStartup - _dinnerTimeStart > ActivateGhostTime))
                 {
                     _visualManager.ActivateGhosts();
-                    _dinnerTimestart = 0;
+                    _dinnerTimeStart = 0;
                 }
-                _model.Update(current_direction);
-                _model.UpdateGhostA(ghost_direction, _isCherryConsumed);
+                _model.Update(_currentDirection);
+                _model.UpdateGhostA(_ghostDirection, _isCherryConsumed);
                 _model.UpdateGhostB(_isCherryConsumed);
-                yield return new WaitForSeconds(ITERATION_TIME);
+                yield return new WaitForSeconds(IterationTime);
  
             }
         }
 
-        void Update()
+        private void Update()
         {
-            bool isRight = (Input.GetAxis("DPadX") < -0.1f) ? true : false;
-            bool isLeft = (Input.GetAxis("DPadX") > 0.1f) ? true : false;
-            bool isDown = (Input.GetAxis("DPadY") < -0.1f) ? true : false;
-            bool isUp = (Input.GetAxis("DPadY") > 0.1f) ? true : false;
+            var isRight = Input.GetAxis("DPadX") < -0.1f;
+            var isLeft = Input.GetAxis("DPadX") > 0.1f;
+            var isDown = Input.GetAxis("DPadY") < -0.1f;
+            var isUp = Input.GetAxis("DPadY") > 0.1f;
 
             if (isUp)
             {
-                ghost_direction = eDirection.UP;
+                _ghostDirection = eDirection.UP;
             }
             if (isDown)
             {
-                ghost_direction = eDirection.DOWN;
+                _ghostDirection = eDirection.DOWN;
             }
             if (isRight)
             {
-                ghost_direction = eDirection.RIGHT;
+                _ghostDirection = eDirection.RIGHT;
             }
             if (isLeft)
             {
-                ghost_direction = eDirection.LEFT;
+                _ghostDirection = eDirection.LEFT;
             }
 
             if (Input.GetKeyDown(KeyCode.UpArrow))
             {
-                current_direction = eDirection.UP;
+                _currentDirection = eDirection.UP;
                 _visualManager.RotatePacMan(90);
             }
             if (Input.GetKeyDown(KeyCode.DownArrow))
             {
-                current_direction = eDirection.DOWN;
+                _currentDirection = eDirection.DOWN;
                 _visualManager.RotatePacMan(270);
             }
             if (Input.GetKeyDown(KeyCode.RightArrow))
             {
-                current_direction = eDirection.RIGHT;
+                _currentDirection = eDirection.RIGHT;
                 _visualManager.RotatePacMan(0);
             }
             if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
-                current_direction = eDirection.LEFT;
+                _currentDirection = eDirection.LEFT;
                 _visualManager.RotatePacMan(180);
             }
         }
 
-        public void CherryConsumed()
+        private void CherryConsumed()
         {
             print("[print][GameMediator] Cherry consumed");
             _isCherryConsumed = true;
-            _dinnerTimestart = Time.realtimeSinceStartup;
+            _dinnerTimeStart = Time.realtimeSinceStartup;
             _visualManager.ScareGhosts();
         }
 

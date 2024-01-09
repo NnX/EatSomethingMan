@@ -1,6 +1,4 @@
 using Game.Misc;
-using UnityEngine;
-using System.Collections.Generic;
 using System.Collections;
 namespace Game.Model
 {

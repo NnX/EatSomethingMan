@@ -1,15 +1,14 @@
-using Game.Misc;
 using UnityEngine;
-using WCTools;
 using UnityEngine.SceneManagement;
+using WCTools;
 
-namespace Game.View
+namespace Src.View
 { 
     public interface IGhostB
     {
         void UpdatePosition(Vector2 position, float time); // TODO make one interface for ghosts
-        bool isScared { set; }
-        bool isActive { get; set; }
+        bool IsScared { set; }
+        bool IsActive { get; set; }
         void UpdateSprite(Sprite sprite);
     }
 
@@ -17,21 +16,20 @@ namespace Game.View
 
     public class GhostB : MonoBehaviour, IGhostB
     {
-        int CoinCounter = 0;
-        bool _isScared;
-        SpriteRenderer _spriteRenderer;
+        private int _coinCounter = 0;
+        private bool _isScared;
+        private SpriteRenderer _spriteRenderer;
 
         public IGhostB CloneMe(Transform parent, Vector2 position)
         {
-            GameObject _objectGhostB = Instantiate(gameObject, parent);
-            BoxCollider2D boxCollider = _objectGhostB.AddComponent<BoxCollider2D>();
+            var objectGhostB = Instantiate(gameObject, parent);
+            objectGhostB.AddComponent<BoxCollider2D>();
 
-            Rigidbody2D rigid = _objectGhostB.AddComponent<Rigidbody2D>();
+            var rigid = objectGhostB.AddComponent<Rigidbody2D>();
             rigid.bodyType = RigidbodyType2D.Kinematic;
-            GhostB ghostB = _objectGhostB.GetComponent<GhostB>();
+            var ghostB = objectGhostB.GetComponent<GhostB>();
             ghostB.transform.localPosition = position;
 
-                
             return ghostB;
         }
 
@@ -39,16 +37,16 @@ namespace Game.View
 
         CoroutineInterpolator _positionInterp;
 
-        bool IGhostB.isScared { set => _isScared = value; }
-        public bool isActive { get => this.gameObject.activeSelf; set => this.gameObject.SetActive(value); }
+        bool IGhostB.IsScared { set => _isScared = value; }
+        public bool IsActive { get => gameObject.activeSelf; set => gameObject.SetActive(value); }
 
         public void UpdateSprite(Sprite sprite)
         {
-            SpriteRenderer _spriteRenderer = this.gameObject.GetComponent<SpriteRenderer>();
-            _spriteRenderer.sprite = sprite;
+            var spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+            spriteRenderer.sprite = sprite;
         }
 
-        void Awake()
+        private void Awake()
         {
             _positionInterp = new CoroutineInterpolator(this);
         }
@@ -67,7 +65,7 @@ namespace Game.View
             }
         }
 
-        void OnTriggerEnter2D(Collider2D other)
+        private void OnTriggerEnter2D(Collider2D other)
         {
             if (other.name == "PacMan(Clone)")
             {

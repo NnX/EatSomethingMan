@@ -1,9 +1,9 @@
 using UnityEngine;
-using WCTools;
-using UnityEngine.SceneManagement;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
+using WCTools;
 
-namespace Game.View
+namespace Src.View
 { 
     public interface IPacMan
     {
@@ -15,16 +15,17 @@ namespace Game.View
 
     public class PacMan : MonoBehaviour, IPacMan
     {
-        int CoinCounter = 0;
-        UnityEvent _unityEvent;
+        private int _coinCounter;
+        private UnityEvent _unityEvent;
+        
         public IPacMan CloneMe(Transform parent, Vector2 position, UnityEvent unityEvent)
         {
-            GameObject newObj = Instantiate(gameObject, parent);
-            BoxCollider2D boxCollider = newObj.AddComponent<BoxCollider2D>();
+            var newObj = Instantiate(gameObject, parent);
+            var boxCollider = newObj.AddComponent<BoxCollider2D>();
             boxCollider.isTrigger = true;
-            Rigidbody2D rigid = newObj.AddComponent<Rigidbody2D>();
+            var rigid = newObj.AddComponent<Rigidbody2D>();
             rigid.bodyType = RigidbodyType2D.Kinematic;
-            PacMan pacMan = newObj.GetComponent<PacMan>();
+            var pacMan = newObj.GetComponent<PacMan>();
             pacMan.transform.localPosition = position;
             pacMan._unityEvent = unityEvent;
             return pacMan;
@@ -32,9 +33,9 @@ namespace Game.View
 
         // ===================================
 
-        CoroutineInterpolator _positionInterp;
+        private CoroutineInterpolator _positionInterp;
 
-        void Awake()
+        private void Awake()
         {
             _positionInterp = new CoroutineInterpolator(this);
         }
@@ -50,13 +51,13 @@ namespace Game.View
                 });
         }
 
-        void OnTriggerEnter2D(Collider2D other)
+        private void OnTriggerEnter2D(Collider2D other)
         {
 
             switch (other.name) {
                 case "Coin(Clone)":
-                    CoinCounter++;
-                    if (CoinCounter == Constant.FieldSize - 1)
+                    _coinCounter++;
+                    if (_coinCounter == Constant.FieldSize - 1)
                     {
                         Debug.Log("YOU WIN!!!");
                         SceneManager.LoadScene("win", LoadSceneMode.Single);
