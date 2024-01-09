@@ -2,28 +2,24 @@ namespace Game.Model
 {
     public abstract partial class ModelBase
     {
-        public interface IContext
+        protected interface IContext
         {
-            IField Field { get; }
+            public IField Field { get; }
         }
 
-        public interface IContextWritable : IContext
+        protected interface IContextWritable : IContext
         {
-            new IField Field { get; }
-            ICharactersContainer CharactardsContainer { get; }
+            public new IField Field { get; }
+            public ICharactersContainer CharactersContainer { get; }
 
-            IEventManagerInternal EventManager { get; }
+            public IEventManagerInternal EventManager { get; }
         }
 
-        // #############################################
-
-        class Context : IContext, IContextWritable
+        private class Context : IContextWritable
         {
-            ICharactersContainer _charactersContainer;
-            IField _field;
-            IEventManagerInternal _eventManager;
-
-            // =======================================
+            private readonly ICharactersContainer _charactersContainer;
+            private readonly IField _field;
+            private readonly IEventManagerInternal _eventManager;
 
             public Context(ICharactersContainer characterContainer, IField field, IEventManagerInternal eventManager)
             {
@@ -32,15 +28,9 @@ namespace Game.Model
                 _eventManager = eventManager;
                 _field.InitWalls();
             }
-
-            // ============== IContext ================
-
             IField IContext.Field => _field;
-
-            // ========== IContextWritable ============
-
             IField IContextWritable.Field => _field;
-            ICharactersContainer IContextWritable.CharactardsContainer => _charactersContainer;
+            ICharactersContainer IContextWritable.CharactersContainer => _charactersContainer;
             IEventManagerInternal IContextWritable.EventManager => _eventManager;
         }
     }

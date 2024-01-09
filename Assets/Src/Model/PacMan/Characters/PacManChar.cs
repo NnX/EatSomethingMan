@@ -4,11 +4,8 @@ namespace Game.Model
     {
         protected class PacMan : IPacManWritable
         {
-            int _x;
-            int _y;
-            bool _is_moving = true;
-
-            // =============================
+            private int _x;
+            private int _y;
 
             public PacMan(int x, int y)
             {
@@ -16,17 +13,12 @@ namespace Game.Model
                 _y = y;
             }
 
-            // ======= IPacMan =============
-
             int IPacMan.X => _x;
             int IPacMan.Y => _y;
 
             void IPacManWritable.Moving(bool isMoving)
             {
-                _is_moving = isMoving;
             }
-
-            // ====== ICharacterWritable ==
 
             void IPacManWritable.UpdatePosition(int x, int y)
             {

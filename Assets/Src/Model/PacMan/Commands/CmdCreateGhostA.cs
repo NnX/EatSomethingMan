@@ -2,12 +2,10 @@ namespace Game.Model
 {
     public partial class ModelPacMan
     {
-        class CmdCreateGhostA : ICommand
+        private class CmdCreateGhostA : ICommand
         {
-            int _x;
-            int _y;
-
-            // ========================================
+            private readonly int _x;
+            private readonly int _y;
 
             public CmdCreateGhostA(int x, int y)
             {
@@ -15,11 +13,9 @@ namespace Game.Model
                 _y = y;
             } 
 
-            // ============== ICommand ================
-
             void ICommand.Exec(IContextWritable context)
             {
-                context.CharactardsContainer.Add<IGhostAWritable>(new GhostA(_x, _y));
+                context.CharactersContainer.Add<IGhostAWritable>(new GhostA(_x, _y));
                 context.EventManager.Get<IPacManEventsWritable>().CreateGhostA(_x, _y);
             }
         }

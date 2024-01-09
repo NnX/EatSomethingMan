@@ -4,6 +4,7 @@ using Game.Model;
 using Src.View;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace Src
 {
@@ -17,24 +18,21 @@ namespace Src
         [SerializeField] VisualManager _visualManager;
         [SerializeField] GameObject playerSelectionMenu;
 
-        public UnityEvent _cherryEvent = new UnityEvent();
+        [FormerlySerializedAs("_cherryEvent")] public UnityEvent cherryEvent = new();
         private eDirection _currentDirection = eDirection.RIGHT;
         private eDirection _ghostDirection = eDirection.DOWN;
         private readonly IModelPacMan _model = new ModelPacMan();
         private bool _isCherryConsumed;
         private float _dinnerTimeStart; // TODO fix reset activate ghost timer if cherry is eaten again? Bug or feature?
-        // ====================================
 
         IVisualManager VisualManager => _visualManager;
-
-        // ====================================
 
         private IEnumerator Start()
         {
             Time.timeScale = 0;
             VisualManager.Init(_model.EventManager, IterationTime);
-            _cherryEvent.AddListener(CherryConsumed);
-            _model.Init(_cherryEvent);
+            cherryEvent.AddListener(CherryConsumed);
+            _model.Init(cherryEvent);
             _model.InitGhostA();
             _model.InitGhostB();
 

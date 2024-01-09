@@ -9,23 +9,19 @@ namespace Game.Model
             void Push(ICommand command);
         }
 
-        interface ITurnInternal : ITurn
+        protected interface ITurnInternal : ITurn
         {
             void Exec(IContextWritable context);
         }
 
-        // ##################################
-
-        class Turn : ITurn, ITurnInternal
+        private class Turn : ITurn, ITurnInternal
         {
-            List<ICommand> _commands = new List<ICommand>();
-
-            // ======= ITurn ===============
+            private readonly List<ICommand> _commands = new();
 
             void ITurn.Push(ICommand command)
-            { _commands.Add(command); }
-
-            // ======= ITurnInternal =======
+            {
+                _commands.Add(command);
+            }
 
             void ITurnInternal.Exec(IContextWritable context)
             {

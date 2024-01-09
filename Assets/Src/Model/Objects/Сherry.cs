@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Src.View;
+using UnityEngine;
 
 namespace Src.Model.Objects
 {
@@ -6,7 +7,7 @@ namespace Src.Model.Objects
     {
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.name.Equals("PacMan(Clone)"))
+            if (other.TryGetComponent<PacMan>(out _))
             {
                 Destroy(gameObject);
             }

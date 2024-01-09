@@ -1,15 +1,11 @@
-using Game.Misc;
-
 namespace Game.Model
 {
     public partial class ModelPacMan
     {
-        class CmdCreateGhostB : ICommand
+        private class CmdCreateGhostB : ICommand
         {
-            int _x;
-            int _y;
-
-            // ========================================
+            private readonly int _x;
+            private readonly int _y;
 
             public CmdCreateGhostB(int x, int y)
             {
@@ -17,13 +13,10 @@ namespace Game.Model
                 _y = y;
             }
 
-             // ============== ICommand ================
-
             void ICommand.Exec(IContextWritable context)
             {
-                context.CharactardsContainer.Add<IGhostBWritable>(new GhostB(_x, _y));
+                context.CharactersContainer.Add<IGhostBWritable>(new GhostB(_x, _y));
                 context.EventManager.Get<IPacManEventsWritable>().CreateGhostB(_x, _y);
-
             }
         }
     }

@@ -14,25 +14,19 @@ namespace Game.Model
         void UpdateGhostB(bool isScared);
     }
      
-
-    // ##################################################
-
     public partial class ModelPacMan : ModelBase, IModelPacMan
     {
-
-        int DIRECTION_MAX_STEPS = 7;
-        ePacmanPosition _ePacmanPosition;
-        eDirection _eDirectionGhostB_last;
-        eDirection _eDirectionGhostB_current;
-        int direction_counter = 0;
-        UnityEvent _cherryEvent;
+        private const int DirectionMaxSteps = 7;
+        private ePacmanPosition _ePacmanPosition;
+        private eDirection _eDirectionGhostBLast;
+        private eDirection _eDirectionGhostBCurrent;
+        private int _directionCounter;
+        private UnityEvent _cherryEvent;
 
         protected override void RegisterEvents(IEventManagerInternal eventManager)
         {
             eventManager.Register<IPacManEvents, IPacManEventsWritable>(new PacManEvents());
         }
-
-        // ============== IModelPacMan =================
 
         IEventManager IModelPacMan.EventManager => EventManager;
 
@@ -40,25 +34,19 @@ namespace Game.Model
         {
             _cherryEvent = cherryEvent;
             CreateAndExecuteTurn(
-                (ITurn turn) =>
-                {
-                    turn.Push(new CmdCreatePacMan(0, 0, _cherryEvent));
-                });
+                turn => { turn.Push(new CmdCreatePacMan(0, 0, _cherryEvent)); });
         }
 
         void IModelPacMan.Update(eDirection direction)
         {
             CreateAndExecuteTurn(
-                (ITurn turn) =>
-                {
-                    turn.Push(new CmdMovePacMan(direction));
-                });
+                turn => { turn.Push(new CmdMovePacMan(direction)); });
         }
 
         void IModelPacMan.InitGhostA()
         {
             CreateAndExecuteTurn(
-                (ITurn turn) =>
+                turn =>
                 {
                     ICommand cmdCreateGhostA = new CmdCreateGhostA(15, 11);
                     turn.Push(cmdCreateGhostA);
@@ -69,16 +57,16 @@ namespace Game.Model
         {
             _ePacmanPosition = ePacmanPosition.DownDown;
             CreateAndExecuteTurn(
-                (ITurn turn) =>
+                turn =>
                 {
-                    CmdMoveGhostA cmdMoveGhostA = new CmdMoveGhostA(direction, _ePacmanPosition, isScared);
+                    var cmdMoveGhostA = new CmdMoveGhostA(direction, _ePacmanPosition, isScared);
                     turn.Push(cmdMoveGhostA);
                 });
         }
         void IModelPacMan.InitGhostB()
         {
             CreateAndExecuteTurn(
-                (ITurn turn) =>
+                turn =>
                 {
                     ICommand cmdCreateGhostB = new CmdCreateGhostB(8, 7);
                     turn.Push(cmdCreateGhostB);
@@ -88,32 +76,36 @@ namespace Game.Model
         void IModelPacMan.UpdateGhostB(bool isScared)
         {
             CreateAndExecuteTurn(
-                (ITurn turn) =>
+                turn =>
                 {
-                    CmdMoveGhostB cmdMoveGhostB = new CmdMoveGhostB(_eDirectionGhostB_current, isScared);
+                    var cmdMoveGhostB = new CmdMoveGhostB(_eDirectionGhostBCurrent, isScared);
                     if (!isScared)
                     {
-                        _eDirectionGhostB_last = _eDirectionGhostB_current;
-                        _eDirectionGhostB_current = cmdMoveGhostB.getDirection(_eDirectionGhostB_current, _context);
+                        _eDirectionGhostBLast = _eDirectionGhostBCurrent;
+                        _eDirectionGhostBCurrent = cmdMoveGhostB.GetDirection(_eDirectionGhostBCurrent, _context);
 
-                        if(_eDirectionGhostB_current == _eDirectionGhostB_last)
+                        if (_eDirectionGhostBCurrent == _eDirectionGhostBLast)
                         {
-                            direction_counter++;
-                        } else
+                            _directionCounter++;
+                        }
+                        else
                         {
-                            direction_counter = 0;
+                            _directionCounter = 0;
                         }
 
-                        if (direction_counter == DIRECTION_MAX_STEPS) // fixed sticking to borders
+                        if (_directionCounter == DirectionMaxSteps) // fixed sticking to borders
                         {
-                            while(_eDirectionGhostB_last == _eDirectionGhostB_current)
+                            while (_eDirectionGhostBLast == _eDirectionGhostBCurrent)
                             {
                                 cmdMoveGhostB.ChangeDirection();
-                                _eDirectionGhostB_current = cmdMoveGhostB.getDirection(_eDirectionGhostB_current, _context);
+                                _eDirectionGhostBCurrent =
+                                    cmdMoveGhostB.GetDirection(_eDirectionGhostBCurrent, _context);
                             }
-                            direction_counter = 0;
+
+                            _directionCounter = 0;
                         }
                     }
+
                     turn.Push(cmdMoveGhostB);
                 });
         } 

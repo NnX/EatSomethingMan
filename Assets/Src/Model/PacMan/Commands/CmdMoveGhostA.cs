@@ -1,17 +1,16 @@
 using Game.Misc;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Game.Model
 {
     public partial class ModelPacMan
     {
-        class CmdMoveGhostA : ICommand
+        private class CmdMoveGhostA : ICommand
         {
-            eDirection _direction;
-            ePacmanPosition _pacmanPosition;
-            bool _isScared = false;
-
-            // ========================================
+            private eDirection _direction;
+            private ePacmanPosition _pacmanPosition;
+            private readonly bool _isScared;
 
             public CmdMoveGhostA(eDirection direction, ePacmanPosition pacmanPosition, bool isScared) {               
                 _direction = direction;
@@ -19,54 +18,53 @@ namespace Game.Model
                 _isScared = isScared;
             }
 
-            public void setDirection(eDirection direction)
+            public void SetDirection(eDirection direction)
             {
                 _direction = direction;
             }
-
-            // ============== ICommand ================
 
             void ICommand.Exec(IContextWritable context)
             {
 
                 if(Constant.IsTwoPlayers)
                 {
-                    IGhostAWritable ghostA = context.CharactardsContainer.Get<IGhostAWritable>();
-                    bool isCanMove = context.Field.IsCanMove(ghostA.X, ghostA.Y, _direction);
+                    var ghostA = context.CharactersContainer.Get<IGhostAWritable>();
+                    var isCanMove = context.Field.IsCanMove(ghostA.X, ghostA.Y, _direction);
 
-                    if (isCanMove)
+                    if (!isCanMove)
                     {
-                        (int x, int y) nextPositon = Direction.GetNextPosition(ghostA.X, ghostA.Y, _direction);
-                        ghostA.UpdatePositionA(nextPositon.x, nextPositon.y);
-                        context.EventManager.Get<IPacManEventsWritable>().UpdateGhostAPosition(nextPositon.x, nextPositon.y);
+                        return;
                     }
-                } else
+                    
+                    var nextPosition = Direction.GetNextPosition(ghostA.X, ghostA.Y, _direction);
+                    ghostA.UpdatePositionA(nextPosition.x, nextPosition.y);
+                    context.EventManager.Get<IPacManEventsWritable>().UpdateGhostAPosition(nextPosition.x, nextPosition.y);
+                }
+                else
                 {
-                    IGhostAWritable ghostA = context.CharactardsContainer.Get<IGhostAWritable>();
-                    IPacManWritable pacman = context.CharactardsContainer.Get<IPacManWritable>();
+                    var ghostA = context.CharactersContainer.Get<IGhostAWritable>();
+                    var pacman = context.CharactersContainer.Get<IPacManWritable>();
 
-                    ePacmanPosition pacmanPosition = Direction.getPacmanPosition(pacman.X, pacman.Y, ghostA.X, ghostA.Y);
-                    List<eDirection> directions = new List<eDirection>();
+                    var pacmanPosition = Direction.getPacmanPosition(pacman.X, pacman.Y, ghostA.X, ghostA.Y);
+                    List<eDirection> directions;
 
                     if(_isScared)
                     {
                         directions = Direction.RunFromPacman(pacmanPosition);
-                    } else
+                    } 
+                    else
                     {
                         directions = Direction.FindPacman(pacmanPosition);
                     }
-                    foreach (eDirection direction in directions)
+                    foreach (var direction in directions.Where(direction => context.Field.IsCanMove(ghostA.X, ghostA.Y, direction)))
                     {
-                        if (context.Field.IsCanMove(ghostA.X, ghostA.Y, direction))
-                        {
-                            _direction = direction;
-                            break;
-                        }
+                        _direction = direction;
+                        break;
                     }
 
-                    (int x, int y) nextPositon = Direction.GetNextPosition(ghostA.X, ghostA.Y, _direction);
-                    ghostA.UpdatePositionA(nextPositon.x, nextPositon.y);
-                    context.EventManager.Get<IPacManEventsWritable>().UpdateGhostAPosition(nextPositon.x, nextPositon.y);
+                    var nextPosition = Direction.GetNextPosition(ghostA.X, ghostA.Y, _direction);
+                    ghostA.UpdatePositionA(nextPosition.x, nextPosition.y);
+                    context.EventManager.Get<IPacManEventsWritable>().UpdateGhostAPosition(nextPosition.x, nextPosition.y);
                 }
             }
         }

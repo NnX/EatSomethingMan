@@ -1,17 +1,14 @@
-using Game.Misc;
 using UnityEngine.Events;
 
 namespace Game.Model
 {
     public partial class ModelPacMan
     {
-        class CmdCreatePacMan : ICommand
+        private class CmdCreatePacMan : ICommand
         {
-            int _x;
-            int _y;
-            UnityEvent _cherryEvent;
-
-            // ========================================
+            private readonly int _x;
+            private readonly int _y;
+            private readonly UnityEvent _cherryEvent;
 
             public CmdCreatePacMan(int x, int y, UnityEvent cherryEvent)
             {
@@ -20,11 +17,9 @@ namespace Game.Model
                 _y = y;
             }
 
-            // ============== ICommand ================
-
             void ICommand.Exec(IContextWritable context)
             { 
-                context.CharactardsContainer.Add<IPacManWritable>(new PacMan(_x, _y));
+                context.CharactersContainer.Add<IPacManWritable>(new PacMan(_x, _y));
                 context.EventManager.Get<IPacManEventsWritable>().CreatePacMan(_x, _y, _cherryEvent);
             }
         }

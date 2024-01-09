@@ -1,38 +1,33 @@
 using Game.Misc;
-using System.Collections.Generic;
 
 namespace Game.Model
 {
     public partial class ModelPacMan
     {
-        class CmdMoveGhostB : ICommand
+        private class CmdMoveGhostB : ICommand
         {
-            eDirection _direction = eDirection.RIGHT;
-            bool _isScared = false;
-
-            // ========================================
+            private eDirection _direction;
+            private readonly bool _isScared;
 
             public CmdMoveGhostB(eDirection direction, bool isScared) {
                 _direction = direction;
                 _isScared = isScared;
             }
 
-            public void setDirection(eDirection direction)
+            public void SetDirection(eDirection direction)
             {
                 _direction = direction;
             }
 
-            // ============== ICommand ================
-
             void ICommand.Exec(IContextWritable context)
             {
-                IGhostBWritable ghostB = context.CharactardsContainer.Get<IGhostBWritable>();
+                var ghostB = context.CharactersContainer.Get<IGhostBWritable>();
                 if(_isScared)
                 {
-                    IPacManWritable pacman = context.CharactardsContainer.Get<IPacManWritable>();
+                    var pacman = context.CharactersContainer.Get<IPacManWritable>();
 
-                    ePacmanPosition pacmanPosition = Direction.getPacmanPosition(pacman.X, pacman.Y, ghostB.X, ghostB.Y);
-                    List<eDirection> directions = Direction.RunFromPacman(pacmanPosition);
+                    var pacmanPosition = Direction.getPacmanPosition(pacman.X, pacman.Y, ghostB.X, ghostB.Y);
+                    var directions = Direction.RunFromPacman(pacmanPosition);
 
                     foreach (eDirection direction in directions)
                     {
@@ -45,7 +40,7 @@ namespace Game.Model
                 } else
                 {
 
-                    bool isCanMove = context.Field.IsCanMove(ghostB.X, ghostB.Y, _direction);
+                    var isCanMove = context.Field.IsCanMove(ghostB.X, ghostB.Y, _direction);
                     while(!isCanMove) 
                     {
                         ChangeDirection();
@@ -53,15 +48,15 @@ namespace Game.Model
                     }
                 }
                 
-                (int x, int y) nextPositon = Direction.GetNextPosition(ghostB.X, ghostB.Y, _direction);
-                ghostB.UpdatePositionB(nextPositon.x, nextPositon.y);
-                context.EventManager.Get<IPacManEventsWritable>().UpdateGhostBPosition(nextPositon.x, nextPositon.y);
+                var nextPosition = Direction.GetNextPosition(ghostB.X, ghostB.Y, _direction);
+                ghostB.UpdatePositionB(nextPosition.x, nextPosition.y);
+                context.EventManager.Get<IPacManEventsWritable>().UpdateGhostBPosition(nextPosition.x, nextPosition.y);
             }
 
-            public eDirection getDirection(eDirection direction, IContextWritable context)
+            public eDirection GetDirection(eDirection direction, IContextWritable context)
             {
-                IGhostBWritable ghostB = context.CharactardsContainer.Get<IGhostBWritable>();
-                bool isCanMove = context.Field.IsCanMove(ghostB.X, ghostB.Y, direction);
+                var ghostB = context.CharactersContainer.Get<IGhostBWritable>();
+                var isCanMove = context.Field.IsCanMove(ghostB.X, ghostB.Y, direction);
                 while (!isCanMove)
                 {
                     ChangeDirection();
@@ -72,8 +67,7 @@ namespace Game.Model
 
             public void ChangeDirection ()
             {
-                
-                int newDirection = UnityEngine.Random.Range(0, 4);
+                var newDirection = UnityEngine.Random.Range(0, 4);
                 switch(newDirection)
                 {
                     case 0:

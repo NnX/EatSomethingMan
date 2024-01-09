@@ -12,11 +12,8 @@ namespace Src.View
         void UpdateSprite(Sprite sprite);
     }
 
-    // #########################################
-
     public class GhostB : MonoBehaviour, IGhostB
     {
-        private int _coinCounter = 0;
         private bool _isScared;
         private SpriteRenderer _spriteRenderer;
 
@@ -33,9 +30,7 @@ namespace Src.View
             return ghostB;
         }
 
-        // ===================================
-
-        CoroutineInterpolator _positionInterp;
+        private CoroutineInterpolator _positionInterp;
 
         bool IGhostB.IsScared { set => _isScared = value; }
         public bool IsActive { get => gameObject.activeSelf; set => gameObject.SetActive(value); }
@@ -51,11 +46,9 @@ namespace Src.View
             _positionInterp = new CoroutineInterpolator(this);
         }
 
-        // ========== IPacMan ================
-
         void IGhostB.UpdatePosition(Vector2 position, float time)
         {
-            if(this.gameObject.activeSelf)
+            if(gameObject.activeSelf)
             {
                 _positionInterp.Interpolate(transform.localPosition, position, time,
                     (Vector2 pos) =>
@@ -72,7 +65,7 @@ namespace Src.View
                 if(_isScared)
                 {
                     print("[GhostB]Om nom nom");
-                    this.gameObject.SetActive(false);
+                    gameObject.SetActive(false);
                 } else
                 {
                     Debug.Log("Ghost B Haha, GAME OVER!!!");

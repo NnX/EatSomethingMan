@@ -7,26 +7,23 @@ namespace Game.Model
     {
         public interface ICharactersContainer
         {
-            T Get<T>() where T : class;
-            void Add<T>(T obj) where T : class;
+            public TCharacterType Get<TCharacterType>() where TCharacterType : class;
+            public void Add<TCharacterType>(TCharacterType obj) where TCharacterType : class;
         }
 
-        // #########################################
-
-        class CharactersContainer : ICharactersContainer
+        private class CharactersContainer : ICharactersContainer
         {
-            Dictionary<Type, List<object>> _characters = new Dictionary<Type, List<object>>();
-
-            // ======== ICharactersContainer =======
-
-            T ICharactersContainer.Get<T>()
+            private readonly Dictionary<Type, List<object>> _characters = new();
+            TCharacterType ICharactersContainer.Get<TCharacterType>()
             {
-                Type id = typeof(T);
-                List<object> objectsList;
-                if (_characters.TryGetValue(id, out objectsList))
+                var id = typeof(TCharacterType);
+                if (_characters.TryGetValue(id, out var objectsList))
                 {
                     if (objectsList.Count > 0)
-                        return objectsList[0] as T;
+                    {
+                        return objectsList[0] as TCharacterType;
+                    }
+                        
                 }
 
                 return null;
@@ -34,15 +31,13 @@ namespace Game.Model
 
             void ICharactersContainer.Add<T>(T obj)
             {
-                Type id = typeof(T);
-                List<object> objectsList;
+                var id = typeof(T);
 
-                if (_characters.TryGetValue(id, out objectsList))
+                if (_characters.TryGetValue(id, out var objectsList))
                     objectsList.Add(obj);
                 else
                 {
-                    objectsList = new List<object>();
-                    objectsList.Add(obj);
+                    objectsList = new List<object> { obj };
                     _characters[id] = objectsList;
                 }
             }
