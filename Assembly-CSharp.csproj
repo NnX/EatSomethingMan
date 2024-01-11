@@ -76,6 +76,7 @@
      <Compile Include="Assets\Src\GameMediator.cs" />
      <Compile Include="Assets\Src\Model\PacMan\Commands\CmdMoveGhostA.cs" />
      <Compile Include="Assets\Src\View\PacMan.cs" />
+     <Compile Include="Assets\Src\View\IGhost.cs" />
      <Compile Include="Assets\Src\View\VisualManager.cs" />
      <Compile Include="Assets\Src\Model\Base\ModelBase.cs" />
      <Compile Include="Assets\Src\Model\Objects\Сherry.cs" />
