@@ -26,7 +26,7 @@ namespace Game.Model
                 {
                     var pacman = context.CharactersContainer.Get<IPacManWritable>();
 
-                    var pacmanPosition = Direction.getPacmanPosition(pacman.X, pacman.Y, ghostB.X, ghostB.Y);
+                    var pacmanPosition = Direction.GetPacmanPosition(pacman.X, pacman.Y, ghostB.X, ghostB.Y);
                     var directions = Direction.RunFromPacman(pacmanPosition);
 
                     foreach (eDirection direction in directions)

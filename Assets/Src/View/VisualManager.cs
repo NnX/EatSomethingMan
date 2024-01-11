@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Src.Misc;
 using Src.Model.Objects;
 using UnityEngine;
 using UnityEngine.Events;
@@ -9,8 +10,8 @@ namespace Src.View
     public class CoinCollectedEvent : UnityEvent<int, int>{}
 
     public class Pair {
-        public int X { get; set; }
-        public int Y { get; set; }
+        public int X { get; }
+        public int Y { get; }
 
         public Pair(int x , int y)
         {
@@ -28,31 +29,28 @@ namespace Src.View
         void ScareGhosts();
     }
 
-    // #################################################
     public class VisualManager : MonoBehaviour, IVisualManager
     {
-        [SerializeField] Transform _gameObjectsParent;
-        [SerializeField] CharactersFactory _charactersFactory;
-        [SerializeField] PositionManager _positionManager;
+        [SerializeField] private Transform gameObjectsParent;
+        [SerializeField] private CharactersFactory charactersFactory;
+        [SerializeField] private PositionManager positionManager;
 
-        public GameObject _coinPrefab;
-        public GameObject _cherryPrefab;
-        public CoinCollectedEvent _coinEvent;
+        [SerializeField] public GameObject coinPrefab;
+        [SerializeField] public GameObject cherryPrefab;
+        [SerializeField] public CoinCollectedEvent coinEvent;
         
         private Sprite _cherryGhostSprite;
-        private Sprite _GhostASprite;
-        private Sprite _GhostBSprite;
+        private Sprite _ghostASprite;
+        private Sprite _ghostBSprite;
         private float _iterationTime;
-        private float _degrees = 0;
+        private float _degrees;
         private IPacMan _pacMan;
-        private IGhostA _ghostA;
-        private IGhostB _ghostB;
+        private IGhost _ghostA;
+        private IGhost _ghostB;
         private readonly List<Pair> _freeSquares = new();
 
-        // =============================================
-
-        ICharactersFactory CharactersFactory => _charactersFactory;
-        IPositionManager PositionManager => _positionManager;
+        private ICharactersFactory CharactersFactory => charactersFactory;
+        private IPositionManager PositionManager => positionManager;
 
         public void SpawnCoins(int cherryPosition)
         {
@@ -63,11 +61,13 @@ namespace Src.View
                     if(((x * Constant.FieldHeight) + y) != cherryPosition)
                     {
                         var position = PositionManager.GetPosition(x, y);
-                        var c = Instantiate(_coinPrefab) as GameObject;
-                        var bitcoin = c.GetComponent<Coin>();
-                        bitcoin.coinEvent = _coinEvent;
-                        bitcoin.X = x;
-                        bitcoin.Y = y;
+                        var c = Instantiate(coinPrefab);
+                        if (c.TryGetComponent<Coin>(out var bitcoin))
+                        {
+                            bitcoin.coinEvent = coinEvent;
+                            bitcoin.X = x;
+                            bitcoin.Y = y; 
+                        }
                         c.transform.localPosition = position;
                     }
                 }
@@ -78,12 +78,12 @@ namespace Src.View
         {
             int cherryPositionX;
             int cherryPositionY;
-            if(isInit)
+            if (isInit)
             {
                 cherryPositionX = Random.Range(Constant.FieldWidth / 2, Constant.FieldWidth - 1);
                 cherryPositionY = Random.Range(Constant.FieldHeight / 2, Constant.FieldHeight - 1);
-
-            } else
+            }
+            else
             {
                 var spawnCherryCoordinates = _freeSquares[Random.Range(0, _freeSquares.Count)];
                 cherryPositionX = spawnCherryCoordinates.X;
@@ -91,20 +91,18 @@ namespace Src.View
             }
 
             var position = PositionManager.GetPosition(cherryPositionX, cherryPositionY);
-            var g = Instantiate(_cherryPrefab);
+            var g = Instantiate(cherryPrefab);
             g.transform.localPosition = position;
             return (cherryPositionX * Constant.FieldHeight) + cherryPositionY;
         }
 
-        // ============ IVisualManager =================
-
         void IVisualManager.Init(Game.Model.IEventManager eventsManager, float iterationTime)
         {
-            _coinEvent.AddListener(CoinCollected);
+            coinEvent.AddListener(CoinCollected);
             _iterationTime = iterationTime;
             _cherryGhostSprite = Resources.Load<Sprite>("Sprites/GhostCherry");
-            _GhostASprite = Resources.Load<Sprite>("Sprites/Ghost1");
-            _GhostBSprite = Resources.Load<Sprite>("Sprites/Ghost2");
+            _ghostASprite = Resources.Load<Sprite>("Sprites/Ghost1");
+            _ghostBSprite = Resources.Load<Sprite>("Sprites/Ghost2");
 
             eventsManager.Get<Game.Model.IPacManEvents>().OnCreatePacMan += OnCreatePacMan;
             eventsManager.Get<Game.Model.IPacManEvents>().OnUpdatePacManPosition += OnUpdatePacManPosition;
@@ -116,59 +114,9 @@ namespace Src.View
             eventsManager.Get<Game.Model.IPacManEvents>().UpdateGhostBPosition += UpdateGhostBPosition;
         }
 
-        private void UpdateGhostBPosition(int x, int y)
-        {
-            if(_ghostB.IsActive)
-            {
-                var position = PositionManager.GetPosition(x, y);
-                _ghostB.UpdatePosition(position, _iterationTime);
-            }
-        }
-
-        private void OnCreateGhostB(int x, int y)
-        {
-            var position = PositionManager.GetPosition(x, y);
-            _ghostB = CharactersFactory.CreateGhostB(_gameObjectsParent, position);
-        }
-
-        private void UpdateGhostAPosition(int x, int y)
-        {
-            if(_ghostA.IsActive)
-            {
-                var position = PositionManager.GetPosition(x, y);
-                _ghostA.UpdatePosition(position, _iterationTime);
-            }
-        }
-
-        private void OnCreateGhostA(int x, int y)
-        {
-            var position = PositionManager.GetPosition(x, y);
-            _ghostA = CharactersFactory.CreateGhostA(_gameObjectsParent, position);
-        }
-
-        // =============================================
-
-        private void OnCreatePacMan(int x, int y, UnityEvent unityEvent)
-        {
-            var position = PositionManager.GetPosition(x, y);
-            _pacMan = CharactersFactory.CreatePacMan(_gameObjectsParent, position, unityEvent);
-        }
-
-        void OnUpdatePacManPosition(int x, int y)
-        {
-            var position = PositionManager.GetPosition(x, y);
-            _pacMan.UpdatePosition(position, _iterationTime);
-            _pacMan.Rotate(_degrees);
-        }
-
         public void RotatePacMan(float degrees)
         {
             _degrees = degrees;
-        }
-
-        private void CoinCollected(int x, int y)
-        {
-            _freeSquares.Add(new Pair(x, y));
         }
 
         public void ScareGhosts()
@@ -185,8 +133,8 @@ namespace Src.View
             _ghostA.IsScared = false;
             _ghostB.IsScared = false;
 
-            _ghostA.UpdateSprite(_GhostASprite);
-            _ghostB.UpdateSprite(_GhostBSprite);
+            _ghostA.UpdateSprite(_ghostASprite);
+            _ghostB.UpdateSprite(_ghostBSprite);
         }
 
         public void ActivateGhosts()
@@ -200,6 +148,54 @@ namespace Src.View
             {
                 _ghostB.IsActive = true;
             }
+        }
+        
+
+        private void CoinCollected(int x, int y)
+        {
+            _freeSquares.Add(new Pair(x, y));
+        }
+        private void UpdateGhostBPosition(int x, int y)
+        {
+            if(_ghostB.IsActive)
+            {
+                var position = PositionManager.GetPosition(x, y);
+                _ghostB.UpdatePosition(position, _iterationTime);
+            }
+        }
+        
+        private void UpdateGhostAPosition(int x, int y)
+        {
+            if(_ghostA.IsActive)
+            {
+                var position = PositionManager.GetPosition(x, y);
+                _ghostA.UpdatePosition(position, _iterationTime);
+            }
+        }
+
+        private void OnCreateGhostB(int x, int y)
+        {
+            var position = PositionManager.GetPosition(x, y);
+            _ghostB = CharactersFactory.CreateGhostB(gameObjectsParent, position);
+        }
+
+        private void OnCreateGhostA(int x, int y)
+        {
+            var position = PositionManager.GetPosition(x, y);
+            _ghostA = CharactersFactory.CreateGhostA(gameObjectsParent, position);
+        }
+
+        private void OnCreatePacMan(int x, int y, UnityEvent unityEvent)
+        {
+            var position = PositionManager.GetPosition(x, y);
+            _pacMan = CharactersFactory.CreatePacMan(gameObjectsParent, position, unityEvent);
+        }
+
+        private void OnUpdatePacManPosition(int x, int y)
+        {
+            var position = PositionManager.GetPosition(x, y);
+            _pacMan.UpdatePosition(position, _iterationTime);
+            _pacMan.Rotate(_degrees);
         }
     }
 }

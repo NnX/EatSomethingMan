@@ -185,11 +185,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ad1e690d9cd28546a659d4858b87723, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _visualManager: {fileID: 2067067744}
+  visualManager: {fileID: 2067067744}
   playerSelectionMenu: {fileID: 1449900650}
-  _cherryEvent:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!4 &38044681
 Transform:
   m_ObjectHideFlags: 0
@@ -1898,14 +1895,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f5c6d400bdcd114791fb38d4b2762a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gameObjectsParent: {fileID: 1641078}
-  _charactersFactory: {fileID: 611580204}
-  _positionManager: {fileID: 340316805}
-  _coinPrefab: {fileID: 6138431501540072113, guid: a3ee55b1f19cfed47ace3580611d51f0,
+  gameObjectsParent: {fileID: 1641078}
+  charactersFactory: {fileID: 611580204}
+  positionManager: {fileID: 340316805}
+  coinPrefab: {fileID: 6138431501540072113, guid: a3ee55b1f19cfed47ace3580611d51f0,
     type: 3}
-  _cherryPrefab: {fileID: 8714537035283569138, guid: 4e2b2cab2f7f0f84fbdfe637685906d0,
+  cherryPrefab: {fileID: 8714537035283569138, guid: 4e2b2cab2f7f0f84fbdfe637685906d0,
     type: 3}
-  _coinEvent:
+  coinEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &2135109243

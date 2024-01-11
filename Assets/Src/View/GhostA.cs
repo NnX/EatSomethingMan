@@ -4,23 +4,20 @@ using WCTools;
 
 namespace Src.View
 { 
-    public interface IGhostA
+    public class GhostA : MonoBehaviour, IGhost
     {
-        void UpdatePosition(Vector2 position, float time); // TODO make one interface for ghosts
-        bool IsScared { set; }
-        bool IsActive { get;  set; }
-        void UpdateSprite(Sprite sprite);
-    }
+        public bool IsActive
+        {
+            get => gameObject.activeSelf;
+            set => gameObject.SetActive(value);
+        }
 
-    // #########################################
-
-    public class GhostA : MonoBehaviour, IGhostA
-    {
-        /*private int _coinCounter = 0;*/
+        bool IGhost.IsScared { set => _isScared = value; }
+        
+        private CoroutineInterpolator _positionInterp;
         private bool _isScared;
-        /*private SpriteRenderer _spriteRenderer;*/
-
-        public IGhostA CloneMe(Transform parent, Vector2 position)
+        
+        public IGhost CloneMe(Transform parent, Vector2 position)
         {
             var gameObjectGhostA = Instantiate(gameObject, parent).AddComponent<BoxCollider2D>();
 
@@ -28,20 +25,8 @@ namespace Src.View
             {
                 ghostA.transform.localPosition = position;  
             }
-            /*if(gameObjectGhostA.TryGetComponent<SpriteRenderer>(out var spriteRenderer))
-            {
-                _spriteRenderer = spriteRenderer;
-            }*/
-
             return ghostA;
         }
-
-        // ===================================
-
-        private CoroutineInterpolator _positionInterp;
-
-        bool IGhostA.IsScared { set => _isScared = value; }
-        public bool IsActive { get => gameObject.activeSelf;  set => gameObject.SetActive(value); }
 
         public void UpdateSprite(Sprite sprite)
         {
@@ -50,7 +35,6 @@ namespace Src.View
                 
                 spriteRenderer.sprite = sprite;
             }
-            //_spriteRenderer = spriteRenderer;
         }
 
         private void Awake()
@@ -58,9 +42,7 @@ namespace Src.View
             _positionInterp = new CoroutineInterpolator(this);
         }
 
-        // ========== IPacMan ================
-
-        void IGhostA.UpdatePosition(Vector2 position, float time)
+        void IGhost.UpdatePosition(Vector2 position, float time)
         {
             if(gameObject.activeSelf)
             {
@@ -74,8 +56,7 @@ namespace Src.View
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-
-            if (other.name.Equals("PacMan(Clone)"))
+            if(other.TryGetComponent<PacMan>(out _))
             {
                 if (_isScared)
                 {
@@ -86,20 +67,13 @@ namespace Src.View
                 {
                     Debug.Log("IGhostA Haha, GAME OVER!!!");
                     SceneManager.LoadScene("lost", LoadSceneMode.Single);
-
-                }
+                }  
             }
         }
 
         public void Rotate(float degrees)
         {
-            if(degrees == 180 || degrees == 0)
-            {
-                transform.rotation = Quaternion.Euler(0,degrees,0); // flip 
-            } else
-            {
-                transform.rotation = Quaternion.Euler(0, 0, degrees);
-            }
+            transform.rotation = degrees is 180 or 0 ? Quaternion.Euler(0,degrees,0) : Quaternion.Euler(0, 0, degrees);
         }
  
     }

@@ -93,13 +93,12 @@ namespace Game.Model
                             _directionCounter = 0;
                         }
 
-                        if (_directionCounter == DirectionMaxSteps) // fixed sticking to borders
+                        if (_directionCounter == DirectionMaxSteps) // fix sticking to borders
                         {
                             while (_eDirectionGhostBLast == _eDirectionGhostBCurrent)
                             {
                                 cmdMoveGhostB.ChangeDirection();
-                                _eDirectionGhostBCurrent =
-                                    cmdMoveGhostB.GetDirection(_eDirectionGhostBCurrent, _context);
+                                _eDirectionGhostBCurrent = cmdMoveGhostB.GetDirection(_eDirectionGhostBCurrent, _context);
                             }
 
                             _directionCounter = 0;

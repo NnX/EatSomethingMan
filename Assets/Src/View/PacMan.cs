@@ -1,3 +1,5 @@
+using Src.Misc;
+using Src.Model.Objects;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
@@ -11,12 +13,11 @@ namespace Src.View
         void Rotate(float degrees);
     }
 
-    // #########################################
-
     public class PacMan : MonoBehaviour, IPacMan
     {
         private int _coinCounter;
         private UnityEvent _unityEvent;
+        private CoroutineInterpolator _positionInterp;
         
         public IPacMan CloneMe(Transform parent, Vector2 position, UnityEvent unityEvent)
         {
@@ -25,22 +26,18 @@ namespace Src.View
             boxCollider.isTrigger = true;
             var rigid = newObj.AddComponent<Rigidbody2D>();
             rigid.bodyType = RigidbodyType2D.Kinematic;
-            var pacMan = newObj.GetComponent<PacMan>();
-            pacMan.transform.localPosition = position;
-            pacMan._unityEvent = unityEvent;
+            if (newObj.TryGetComponent<PacMan>(out var pacMan))
+            {
+                pacMan.transform.localPosition = position;
+                pacMan._unityEvent = unityEvent;
+            }
             return pacMan;
         }
-
-        // ===================================
-
-        private CoroutineInterpolator _positionInterp;
 
         private void Awake()
         {
             _positionInterp = new CoroutineInterpolator(this);
         }
-
-        // ========== IPacMan ================
 
         void IPacMan.UpdatePosition(Vector2 position, float time)
         {
@@ -53,36 +50,29 @@ namespace Src.View
 
         private void OnTriggerEnter2D(Collider2D other)
         {
+            if (other.TryGetComponent<Coin>(out _))
+            {
+                ConsumeCoin();
+                return;
+            }
+            if (other.TryGetComponent<Cherry>(out _))
+            {
+                _unityEvent.Invoke();
+            }
+        }
 
-            switch (other.name) {
-                case "Coin(Clone)":
-                    _coinCounter++;
-                    if (_coinCounter == Constant.FieldSize - 1)
-                    {
-                        Debug.Log("YOU WIN!!!");
-                        SceneManager.LoadScene("win", LoadSceneMode.Single);
-                    }
-                    break;
-                case "Cherry(Clone)":
-                    /* GetComponent<PacMan>()?.transform.GetComponent<VisualManager>()?.OnCherryConsumed(); //To use this case we should add visual manager 
-                    GetComponent<VisualManager>()?.OnCherryConsumed();                                      //script to PacMan prefab in the inspector, and this smells not good */
-                    GetComponent<PacMan>()._unityEvent.Invoke(); // TODO find a better way to toss this event in GameMediator
-                    break;
-                default:
-                    Debug.Log("PacMan trigger = " + other.name);
-                    break;
-            } 
+        private void ConsumeCoin()
+        {
+            _coinCounter++;
+            if (_coinCounter == Constant.FieldSize - 1)
+            {
+                SceneManager.LoadScene("win", LoadSceneMode.Single);
+            }
         }
 
         public void Rotate(float degrees)
         {
-            if(degrees == 180 || degrees == 0)
-            {
-                transform.rotation = Quaternion.Euler(0,degrees,0); // flip 
-            } else
-            {
-                transform.rotation = Quaternion.Euler(0, 0, degrees);
-            }
+            transform.rotation = degrees is 180 or 0 ? Quaternion.Euler(0,degrees,0) : Quaternion.Euler(0, 0, degrees);
         }
     }
 }

@@ -155,39 +155,39 @@ namespace Game.Misc
             return parts;
         }
 
-        public static ePacmanPosition getPacmanPosition(int pacman_x, int pacman_y, int ghost_x, int ghost_y)
+        public static ePacmanPosition GetPacmanPosition(int pacmanX, int pacmanY, int ghostX, int ghostY)
         {
             ePacmanPosition pacmanPosition = ePacmanPosition.DownLeft;
 
-            if (pacman_x == ghost_x && pacman_y > ghost_y) // upup // 1
+            if (pacmanX == ghostX && pacmanY > ghostY) // upup // 1
             {
                 pacmanPosition = ePacmanPosition.UpUp;
             }
-            else if (pacman_x > ghost_x && pacman_y > ghost_y)    //up right // 2
+            else if (pacmanX > ghostX && pacmanY > ghostY)    //up right // 2
             {
                 pacmanPosition = ePacmanPosition.UpRight;
             }
-            else if (pacman_x > ghost_x && pacman_y == ghost_y) // right right // 3
+            else if (pacmanX > ghostX && pacmanY == ghostY) // right right // 3
             {
                 pacmanPosition = ePacmanPosition.RightRight;
             }
-            else if (pacman_x > ghost_x && pacman_y < ghost_y) // right down // 4
+            else if (pacmanX > ghostX && pacmanY < ghostY) // right down // 4
             {
                 pacmanPosition = ePacmanPosition.RightDown;
             }
-            else if (pacman_x == ghost_x && pacman_y < ghost_y)    //down down // 5
+            else if (pacmanX == ghostX && pacmanY < ghostY)    //down down // 5
             {
                 pacmanPosition = ePacmanPosition.DownDown;
             }
-            else if (pacman_x < ghost_x && pacman_y < ghost_y) // down left // 6
+            else if (pacmanX < ghostX && pacmanY < ghostY) // down left // 6
             {
                 pacmanPosition = ePacmanPosition.DownLeft;
             }
-            else if (pacman_x < ghost_x && pacman_y == ghost_y) // left left // 7
+            else if (pacmanX < ghostX && pacmanY == ghostY) // left left // 7
             {
                 pacmanPosition = ePacmanPosition.LeftLeft;
             }
-            else if (pacman_x < ghost_x && pacman_y > ghost_y) // left up // 8
+            else if (pacmanX < ghostX && pacmanY > ghostY) // left up // 8
             {
                 pacmanPosition = ePacmanPosition.LeftUp;
             }

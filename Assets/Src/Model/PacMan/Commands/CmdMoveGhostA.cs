@@ -1,6 +1,6 @@
 using Game.Misc;
-using System.Collections.Generic;
 using System.Linq;
+using Src.Misc;
 
 namespace Game.Model
 {
@@ -45,17 +45,9 @@ namespace Game.Model
                     var ghostA = context.CharactersContainer.Get<IGhostAWritable>();
                     var pacman = context.CharactersContainer.Get<IPacManWritable>();
 
-                    var pacmanPosition = Direction.getPacmanPosition(pacman.X, pacman.Y, ghostA.X, ghostA.Y);
-                    List<eDirection> directions;
+                    var pacmanPosition = Direction.GetPacmanPosition(pacman.X, pacman.Y, ghostA.X, ghostA.Y);
 
-                    if(_isScared)
-                    {
-                        directions = Direction.RunFromPacman(pacmanPosition);
-                    } 
-                    else
-                    {
-                        directions = Direction.FindPacman(pacmanPosition);
-                    }
+                    var directions = _isScared ? Direction.RunFromPacman(pacmanPosition) : Direction.FindPacman(pacmanPosition);
                     foreach (var direction in directions.Where(direction => context.Field.IsCanMove(ghostA.X, ghostA.Y, direction)))
                     {
                         _direction = direction;

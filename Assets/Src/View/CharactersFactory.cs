@@ -6,11 +6,9 @@ namespace Src.View
     public interface ICharactersFactory
     {
         IPacMan CreatePacMan(Transform parentTransform, Vector2 position, UnityEvent unityEvent);
-        IGhostA CreateGhostA(Transform parentTransform, Vector2 position);
-        IGhostB CreateGhostB(Transform parentTransform, Vector2 position);
+        IGhost CreateGhostA(Transform parentTransform, Vector2 position);
+        IGhost CreateGhostB(Transform parentTransform, Vector2 position);
     }
-
-    // ##############################################
 
     public class CharactersFactory : MonoBehaviour, ICharactersFactory
     {
@@ -18,19 +16,17 @@ namespace Src.View
         [SerializeField] private GhostA ghostAPrefab;
         [SerializeField] private GhostB ghostBPrefab;
 
-        // ========== ICharactersFactory ============
-
         IPacMan ICharactersFactory.CreatePacMan(Transform parentTransform, Vector2 position, UnityEvent unityEvent)
         {
             return pacManPrefab.CloneMe(parentTransform, position, unityEvent);
         }
 
-        IGhostA ICharactersFactory.CreateGhostA(Transform parentTransform, Vector2 position)
+        IGhost ICharactersFactory.CreateGhostA(Transform parentTransform, Vector2 position)
         {
             return ghostAPrefab.CloneMe(parentTransform, position);
         }
 
-        IGhostB ICharactersFactory.CreateGhostB(Transform parentTransform, Vector2 position)
+        IGhost ICharactersFactory.CreateGhostB(Transform parentTransform, Vector2 position)
         {
             return ghostBPrefab.CloneMe(parentTransform, position);
         }

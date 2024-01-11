@@ -4,36 +4,33 @@ using WCTools;
 
 namespace Src.View
 { 
-    public interface IGhostB
+    public class GhostB : MonoBehaviour, IGhost
     {
-        void UpdatePosition(Vector2 position, float time); // TODO make one interface for ghosts
-        bool IsScared { set; }
-        bool IsActive { get; set; }
-        void UpdateSprite(Sprite sprite);
-    }
-
-    public class GhostB : MonoBehaviour, IGhostB
-    {
+        public bool IsActive
+        {
+            get => gameObject.activeSelf;
+            set => gameObject.SetActive(value);
+        }
+        bool IGhost.IsScared { set => _isScared = value; }
+        
         private bool _isScared;
         private SpriteRenderer _spriteRenderer;
+        private CoroutineInterpolator _positionInterp;
 
-        public IGhostB CloneMe(Transform parent, Vector2 position)
+        public IGhost CloneMe(Transform parent, Vector2 position)
         {
             var objectGhostB = Instantiate(gameObject, parent);
             objectGhostB.AddComponent<BoxCollider2D>();
 
             var rigid = objectGhostB.AddComponent<Rigidbody2D>();
             rigid.bodyType = RigidbodyType2D.Kinematic;
-            var ghostB = objectGhostB.GetComponent<GhostB>();
-            ghostB.transform.localPosition = position;
+            if (objectGhostB.TryGetComponent<GhostB>(out var ghostB))
+            {
+                ghostB.transform.localPosition = position; 
+            }
 
             return ghostB;
         }
-
-        private CoroutineInterpolator _positionInterp;
-
-        bool IGhostB.IsScared { set => _isScared = value; }
-        public bool IsActive { get => gameObject.activeSelf; set => gameObject.SetActive(value); }
 
         public void UpdateSprite(Sprite sprite)
         {
@@ -46,7 +43,7 @@ namespace Src.View
             _positionInterp = new CoroutineInterpolator(this);
         }
 
-        void IGhostB.UpdatePosition(Vector2 position, float time)
+        void IGhost.UpdatePosition(Vector2 position, float time)
         {
             if(gameObject.activeSelf)
             {
@@ -60,7 +57,7 @@ namespace Src.View
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.name == "PacMan(Clone)")
+            if(other.TryGetComponent<PacMan>(out _))
             {
                 if(_isScared)
                 {
@@ -76,13 +73,7 @@ namespace Src.View
 
         public void Rotate(float degrees)
         {
-            if(degrees == 180 || degrees == 0)
-            {
-                transform.rotation = Quaternion.Euler(0,degrees,0); // flip 
-            } else
-            {
-                transform.rotation = Quaternion.Euler(0, 0, degrees);
-            }
+            transform.rotation = degrees is 180 or 0 ? Quaternion.Euler(0,degrees,0) : Quaternion.Euler(0, 0, degrees);
         }
  
     }
