@@ -10,6 +10,7 @@ namespace Game.Model
         protected interface IContextWritable : IContext
         {
             public new IField Field { get; }
+            public void InitWalls(LevelModelObject levelData);
             public ICharactersContainer CharactersContainer { get; }
 
             public IEventManagerInternal EventManager { get; }
@@ -26,7 +27,12 @@ namespace Game.Model
                 _charactersContainer = characterContainer;
                 _field = field;
                 _eventManager = eventManager;
-                _field.InitWalls();
+                
+            }
+
+            public void InitWalls(LevelModelObject levelData)
+            {
+                _field.InitWalls(levelData);
             }
             IField IContext.Field => _field;
             IField IContextWritable.Field => _field;

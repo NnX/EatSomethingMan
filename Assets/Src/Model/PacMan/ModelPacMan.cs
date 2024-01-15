@@ -6,7 +6,7 @@ namespace Game.Model
     {
         IEventManager EventManager { get; }
 
-        void Init(UnityEvent cherryEvent);
+        void Init(UnityEvent cherryEvent, LevelModelObject levelData);
         void Update(eDirection direction);
         void InitGhostA();
         void UpdateGhostA(eDirection direction, bool isScared);
@@ -30,8 +30,9 @@ namespace Game.Model
 
         IEventManager IModelPacMan.EventManager => EventManager;
 
-        void IModelPacMan.Init(UnityEvent cherryEvent)
-        {
+        void IModelPacMan.Init(UnityEvent cherryEvent, LevelModelObject levelData)
+        { 
+            InitWalls(levelData);
             _cherryEvent = cherryEvent;
             CreateAndExecuteTurn(
                 turn => { turn.Push(new CmdCreatePacMan(0, 0, _cherryEvent)); });
@@ -82,7 +83,7 @@ namespace Game.Model
                     if (!isScared)
                     {
                         _eDirectionGhostBLast = _eDirectionGhostBCurrent;
-                        _eDirectionGhostBCurrent = cmdMoveGhostB.GetDirection(_eDirectionGhostBCurrent, _context);
+                        _eDirectionGhostBCurrent = cmdMoveGhostB.GetDirection(_eDirectionGhostBCurrent, ContextWritable);
 
                         if (_eDirectionGhostBCurrent == _eDirectionGhostBLast)
                         {
@@ -98,7 +99,7 @@ namespace Game.Model
                             while (_eDirectionGhostBLast == _eDirectionGhostBCurrent)
                             {
                                 cmdMoveGhostB.ChangeDirection();
-                                _eDirectionGhostBCurrent = cmdMoveGhostB.GetDirection(_eDirectionGhostBCurrent, _context);
+                                _eDirectionGhostBCurrent = cmdMoveGhostB.GetDirection(_eDirectionGhostBCurrent, ContextWritable);
                             }
 
                             _directionCounter = 0;

@@ -1,15 +1,21 @@
 using System;
+using UnityEngine;
 
 namespace Game.Model
 {
     public abstract partial class ModelBase
     {
-        protected readonly IContextWritable _context;
+        protected readonly IContextWritable ContextWritable;
 
         protected ModelBase()
         {
-            _context = new Context(new CharactersContainer(), new Field(), new EventManager());
-            RegisterEvents(_context.EventManager);
+            ContextWritable = new Context(new CharactersContainer(), new Field(), new EventManager());
+            RegisterEvents(ContextWritable.EventManager);
+        }
+
+        protected void InitWalls(LevelModelObject levelData)
+        {
+            ContextWritable.InitWalls(levelData);
         }
 
         protected abstract void RegisterEvents(IEventManagerInternal eventManager);
@@ -18,9 +24,9 @@ namespace Game.Model
         {
             ITurnInternal turn = new Turn();
             onInitTurn?.Invoke(turn);
-            turn.Exec(_context);
+            turn.Exec(ContextWritable);
         }
 
-        protected IEventManager EventManager => _context.EventManager;
+        protected IEventManager EventManager => ContextWritable.EventManager;
     }
 }

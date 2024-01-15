@@ -68,6 +68,7 @@
      <Compile Include="Assets\Src\Misc\CoroutineInterpolator\Internal\Interpolations.cs" />
      <Compile Include="Assets\Src\Model\Base\Context\Context.cs" />
      <Compile Include="Assets\Src\Model\PacMan\Events\EventManager.cs" />
+     <Compile Include="Assets\Src\Model\Base\Field\LevelModelObject.cs" />
      <Compile Include="Assets\Src\Model\PacMan\Characters\PacManChar.cs" />
      <Compile Include="Assets\Src\Model\PacMan\Commands\CmdCreateGhostA.cs" />
      <Compile Include="Assets\Src\Model\Base\CharactersContainer\CharactersContainer.cs" />
@@ -78,6 +79,7 @@
      <Compile Include="Assets\Src\View\PacMan.cs" />
      <Compile Include="Assets\Src\View\IGhost.cs" />
      <Compile Include="Assets\Src\View\VisualManager.cs" />
+     <Compile Include="Assets\Src\Model\Base\Field\GameField.cs" />
      <Compile Include="Assets\Src\Model\Base\ModelBase.cs" />
      <Compile Include="Assets\Src\Model\Objects\Сherry.cs" />
      <Compile Include="Assets\NewGameClick.cs" />

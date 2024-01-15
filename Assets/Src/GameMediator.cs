@@ -31,7 +31,7 @@ namespace Src
             Time.timeScale = 0;
             VisualManager.Init(_model.EventManager, IterationTime);
             _cherryEvent.AddListener(CherryConsumed);
-            _model.Init(_cherryEvent);
+            _model.Init(_cherryEvent, visualManager.GetCurrentLevel());
             _model.InitGhostA();
             _model.InitGhostB();
 

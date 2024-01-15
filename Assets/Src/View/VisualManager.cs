@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Game.Model;
 using Src.Misc;
 using Src.Model.Objects;
 using UnityEngine;
@@ -27,6 +28,7 @@ namespace Src.View
         void RotatePacMan(float degrees);
         int SpawnCherry(bool isInit);
         void ScareGhosts();
+        LevelModelObject GetCurrentLevel();
     }
 
     public class VisualManager : MonoBehaviour, IVisualManager
@@ -126,6 +128,17 @@ namespace Src.View
 
             _ghostA.UpdateSprite(_cherryGhostSprite);
             _ghostB.UpdateSprite(_cherryGhostSprite);
+        }
+
+        public LevelModelObject GetCurrentLevel()
+        {
+            if(gameObjectsParent.TryGetComponent<GameField>(out var gameField))
+            {
+                return gameField.GetFirstLevel();
+            }
+            
+            Debug.LogError("Error, no levels data");
+            return null;
         }
 
         public void ReturnGhostsToNormal()
