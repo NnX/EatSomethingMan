@@ -1,12 +1,12 @@
+using System;
 using Src.Misc;
 using Src.Model.Objects;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using WCTools;
 
 namespace Src.View
-{ 
+{
     public interface IPacMan
     {
         void UpdatePosition(Vector2 position, float time);
@@ -16,22 +16,37 @@ namespace Src.View
     public class PacMan : MonoBehaviour, IPacMan
     {
         private int _coinCounter;
-        private UnityEvent _unityEvent;
+        private Action _onCherryConsumed;
         private CoroutineInterpolator _positionInterp;
-        
-        public IPacMan CloneMe(Transform parent, Vector2 position, UnityEvent unityEvent)
+
+        public IPacMan CloneMe(Transform parent, Vector2 position, Action onCherryConsumed)
         {
             var newObj = Instantiate(gameObject, parent);
-            var boxCollider = newObj.AddComponent<BoxCollider2D>();
-            boxCollider.isTrigger = true;
-            var rigid = newObj.AddComponent<Rigidbody2D>();
-            rigid.bodyType = RigidbodyType2D.Kinematic;
+            EnsurePhysicsSetup(newObj);
             if (newObj.TryGetComponent<PacMan>(out var pacMan))
             {
                 pacMan.transform.localPosition = position;
-                pacMan._unityEvent = unityEvent;
+                pacMan._onCherryConsumed = onCherryConsumed;
             }
+
             return pacMan;
+        }
+
+        private static void EnsurePhysicsSetup(GameObject pacManObject)
+        {
+            if (!pacManObject.TryGetComponent<Collider2D>(out var collider))
+            {
+                collider = pacManObject.AddComponent<BoxCollider2D>();
+            }
+
+            collider.isTrigger = true;
+
+            if (!pacManObject.TryGetComponent<Rigidbody2D>(out var rigidBody))
+            {
+                rigidBody = pacManObject.AddComponent<Rigidbody2D>();
+            }
+
+            rigidBody.bodyType = RigidbodyType2D.Kinematic;
         }
 
         private void Awake()
@@ -41,8 +56,11 @@ namespace Src.View
 
         void IPacMan.UpdatePosition(Vector2 position, float time)
         {
-            _positionInterp.Interpolate(transform.localPosition, position, time,
-                (Vector2 pos) =>
+            var startPosition = transform.localPosition;
+            var targetPosition = new Vector3(position.x, position.y, startPosition.z);
+
+            _positionInterp.Interpolate(startPosition, targetPosition, time,
+                (Vector3 pos) =>
                 {
                     transform.localPosition = pos;
                 });
@@ -55,9 +73,10 @@ namespace Src.View
                 ConsumeCoin();
                 return;
             }
+
             if (other.TryGetComponent<Cherry>(out _))
             {
-                _unityEvent.Invoke();
+                _onCherryConsumed?.Invoke();
             }
         }
 
@@ -72,7 +91,7 @@ namespace Src.View
 
         public void Rotate(float degrees)
         {
-            transform.rotation = degrees is 180 or 0 ? Quaternion.Euler(0,degrees,0) : Quaternion.Euler(0, 0, degrees);
+            transform.rotation = degrees is 180 or 0 ? Quaternion.Euler(0, degrees, 0) : Quaternion.Euler(0, 0, degrees);
         }
     }
 }

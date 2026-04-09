@@ -1,20 +1,27 @@
-﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
+[RequireComponent(typeof(Button))]
 public class NewGameClick : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] private string sceneName = "Level";
+
+    private void Awake()
     {
         GetComponent<Button>().onClick.AddListener(StartNewGame);
     }
 
-    // Update is called once per frame
+    private void OnDestroy()
+    {
+        if (TryGetComponent<Button>(out var button))
+        {
+            button.onClick.RemoveListener(StartNewGame);
+        }
+    }
+
     private void StartNewGame()
     {
-        SceneManager.LoadScene("Level", LoadSceneMode.Single);
+        SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
     }
 }

@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using Game.Misc;
-using System.Collections;
 using Src.Misc;
 
 namespace Game.Model
@@ -13,12 +13,11 @@ namespace Game.Model
             int Height { get; }
 
             bool IsCanMove(int x, int y, eDirection direction);
-            void SetWalls(ArrayList walls);
             void InitWalls(LevelModelObject levelData);
         }
-        
+
         [Serializable]
-        public class Wall
+        public readonly struct Wall : IEquatable<Wall>
         {
             public int FromPosX { get; }
             public int FromPosY { get; }
@@ -32,23 +31,44 @@ namespace Game.Model
                 ToPosX = toX;
                 ToPosY = toY;
             }
-        }        
+
+            public bool Equals(Wall other)
+            {
+                return FromPosX == other.FromPosX
+                    && FromPosY == other.FromPosY
+                    && ToPosX == other.ToPosX
+                    && ToPosY == other.ToPosY;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is Wall other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(FromPosX, FromPosY, ToPosX, ToPosY);
+            }
+        }
+
         [Serializable]
         public class WallData
         {
             public WalPosition[] positions;
-            [Serializable] public struct WalPosition
+
+            [Serializable]
+            public struct WalPosition
             {
-                public int fromX;  
-                public int toX;  
-                public int fromY;  
-                public int toY;  
-            } 
+                public int fromX;
+                public int toX;
+                public int fromY;
+                public int toY;
+            }
         }
 
         private class Field : IField
         {
-            private ArrayList _walls = new();
+            private readonly HashSet<Wall> _walls = new();
             private IField GameField => this;
 
             private bool IsOutOfRange(int x, int y)
@@ -58,14 +78,7 @@ namespace Game.Model
 
             private bool IsWall(int fromX, int fromY, int toX, int toY)
             {
-                foreach (Wall wall in _walls)
-                {
-                    if(fromX == wall.FromPosX && fromY == wall.FromPosY && toX == wall.ToPosX && toY == wall.ToPosY)
-                    {
-                        return true;
-                    }
-                }
-                return false;
+                return _walls.Contains(new Wall(fromX, fromY, toX, toY));
             }
 
             int IField.Width => Constant.FieldWidth;
@@ -74,23 +87,20 @@ namespace Game.Model
             bool IField.IsCanMove(int x, int y, eDirection direction)
             {
                 var nextPosition = Direction.GetNextPosition(x, y, direction);
-                if(IsWall(x, y, nextPosition.x, nextPosition.y))
+                if (IsWall(x, y, nextPosition.x, nextPosition.y))
                 {
                     return false;
                 }
-                return !IsOutOfRange(nextPosition.x, nextPosition.y);
-            }
 
-            public void SetWalls(ArrayList walls)
-            {
-                _walls = walls;
+                return !IsOutOfRange(nextPosition.x, nextPosition.y);
             }
 
             public void InitWalls(LevelModelObject levelData)
             {
+                _walls.Clear();
                 foreach (var pos in levelData.GetWalls().positions)
                 {
-                    _walls.Add(new Wall(pos.fromX, pos.fromY, pos.toX, pos.toY));  
+                    _walls.Add(new Wall(pos.fromX, pos.fromY, pos.toX, pos.toY));
                 }
             }
         }

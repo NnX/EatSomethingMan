@@ -1,10 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GameSettings : MonoBehaviour
 {
+    [SerializeField] private GameObject settingsPanel;
 
-    [SerializeField] GameObject seetings;
-    //Some test data
+    public void SetVisible(bool isVisible)
+    {
+        if (settingsPanel != null)
+        {
+            settingsPanel.SetActive(isVisible);
+        }
+    }
 }

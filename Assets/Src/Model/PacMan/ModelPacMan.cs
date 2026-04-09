@@ -1,27 +1,25 @@
 using Game.Misc;
-using UnityEngine.Events;
+
 namespace Game.Model
 {
     public interface IModelPacMan
     {
         IEventManager EventManager { get; }
 
-        void Init(UnityEvent cherryEvent, LevelModelObject levelData);
+        void Init(LevelModelObject levelData);
         void Update(eDirection direction);
         void InitGhostA();
-        void UpdateGhostA(eDirection direction, bool isScared);
+        void UpdateGhostA(eDirection direction, bool isScared, bool isTwoPlayers);
         void InitGhostB();
         void UpdateGhostB(bool isScared);
     }
-     
+
     public partial class ModelPacMan : ModelBase, IModelPacMan
     {
         private const int DirectionMaxSteps = 7;
-        private ePacmanPosition _ePacmanPosition;
         private eDirection _eDirectionGhostBLast;
         private eDirection _eDirectionGhostBCurrent;
         private int _directionCounter;
-        private UnityEvent _cherryEvent;
 
         protected override void RegisterEvents(IEventManagerInternal eventManager)
         {
@@ -30,12 +28,11 @@ namespace Game.Model
 
         IEventManager IModelPacMan.EventManager => EventManager;
 
-        void IModelPacMan.Init(UnityEvent cherryEvent, LevelModelObject levelData)
-        { 
+        void IModelPacMan.Init(LevelModelObject levelData)
+        {
             InitWalls(levelData);
-            _cherryEvent = cherryEvent;
             CreateAndExecuteTurn(
-                turn => { turn.Push(new CmdCreatePacMan(0, 0, _cherryEvent)); });
+                turn => { turn.Push(new CmdCreatePacMan(0, 0)); });
         }
 
         void IModelPacMan.Update(eDirection direction)
@@ -54,16 +51,16 @@ namespace Game.Model
                 });
         }
 
-        void IModelPacMan.UpdateGhostA(eDirection direction, bool isScared)
+        void IModelPacMan.UpdateGhostA(eDirection direction, bool isScared, bool isTwoPlayers)
         {
-            _ePacmanPosition = ePacmanPosition.DownDown;
             CreateAndExecuteTurn(
                 turn =>
                 {
-                    var cmdMoveGhostA = new CmdMoveGhostA(direction, _ePacmanPosition, isScared);
+                    var cmdMoveGhostA = new CmdMoveGhostA(direction, isScared, isTwoPlayers);
                     turn.Push(cmdMoveGhostA);
                 });
         }
+
         void IModelPacMan.InitGhostB()
         {
             CreateAndExecuteTurn(
@@ -94,7 +91,7 @@ namespace Game.Model
                             _directionCounter = 0;
                         }
 
-                        if (_directionCounter == DirectionMaxSteps) // fix sticking to borders
+                        if (_directionCounter == DirectionMaxSteps)
                         {
                             while (_eDirectionGhostBLast == _eDirectionGhostBCurrent)
                             {
@@ -108,6 +105,6 @@ namespace Game.Model
 
                     turn.Push(cmdMoveGhostB);
                 });
-        } 
+        }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Game.Model;
 using Src.Misc;
@@ -8,22 +9,11 @@ using UnityEngine.Events;
 namespace Src.View
 {
     [System.Serializable]
-    public class CoinCollectedEvent : UnityEvent<int, int>{}
-
-    public class Pair {
-        public int X { get; }
-        public int Y { get; }
-
-        public Pair(int x , int y)
-        {
-            X = x;
-            Y = y;
-        }
-    }
+    public class CoinCollectedEvent : UnityEvent<int, int> {}
 
     public interface IVisualManager
     {
-        void Init(Game.Model.IEventManager eventsManager, float iterationTime);
+        void Init(Game.Model.IEventManager eventsManager, float iterationTime, Action onCherryConsumed);
         void SpawnCoins(int cherryPosition);
         void RotatePacMan(float degrees);
         int SpawnCherry(bool isInit);
@@ -36,20 +26,20 @@ namespace Src.View
         [SerializeField] private Transform gameObjectsParent;
         [SerializeField] private CharactersFactory charactersFactory;
         [SerializeField] private PositionManager positionManager;
+        [SerializeField] private GameObject coinPrefab;
+        [SerializeField] private GameObject cherryPrefab;
+        [SerializeField] private CoinCollectedEvent coinEvent;
 
-        [SerializeField] public GameObject coinPrefab;
-        [SerializeField] public GameObject cherryPrefab;
-        [SerializeField] public CoinCollectedEvent coinEvent;
-        
         private Sprite _cherryGhostSprite;
         private Sprite _ghostASprite;
         private Sprite _ghostBSprite;
         private float _iterationTime;
         private float _degrees;
+        private Action _onCherryConsumed;
         private IPacMan _pacMan;
         private IGhost _ghostA;
         private IGhost _ghostB;
-        private readonly List<Pair> _freeSquares = new();
+        private readonly List<Vector2Int> _freeSquares = new();
 
         private ICharactersFactory CharactersFactory => charactersFactory;
         private IPositionManager PositionManager => positionManager;
@@ -60,18 +50,21 @@ namespace Src.View
             {
                 for (var y = 0; y < Constant.FieldHeight; y++)
                 {
-                    if(((x * Constant.FieldHeight) + y) != cherryPosition)
+                    if (((x * Constant.FieldHeight) + y) == cherryPosition)
                     {
-                        var position = PositionManager.GetPosition(x, y);
-                        var c = Instantiate(coinPrefab);
-                        if (c.TryGetComponent<Coin>(out var bitcoin))
-                        {
-                            bitcoin.coinEvent = coinEvent;
-                            bitcoin.X = x;
-                            bitcoin.Y = y; 
-                        }
-                        c.transform.localPosition = position;
+                        continue;
                     }
+
+                    var position = PositionManager.GetPosition(x, y);
+                    var coin = Instantiate(coinPrefab, gameObjectsParent);
+                    if (coin.TryGetComponent<Coin>(out var coinView))
+                    {
+                        coinView.coinEvent = coinEvent;
+                        coinView.X = x;
+                        coinView.Y = y;
+                    }
+
+                    coin.transform.localPosition = position;
                 }
             }
         }
@@ -82,38 +75,47 @@ namespace Src.View
             int cherryPositionY;
             if (isInit)
             {
-                cherryPositionX = Random.Range(Constant.FieldWidth / 2, Constant.FieldWidth - 1);
-                cherryPositionY = Random.Range(Constant.FieldHeight / 2, Constant.FieldHeight - 1);
+                cherryPositionX = UnityEngine.Random.Range(Constant.FieldWidth / 2, Constant.FieldWidth - 1);
+                cherryPositionY = UnityEngine.Random.Range(Constant.FieldHeight / 2, Constant.FieldHeight - 1);
             }
             else
             {
-                var spawnCherryCoordinates = _freeSquares[Random.Range(0, _freeSquares.Count)];
-                cherryPositionX = spawnCherryCoordinates.X;
-                cherryPositionY = spawnCherryCoordinates.Y;
+                if (_freeSquares.Count == 0)
+                {
+                    Debug.LogWarning("No free squares available to respawn the cherry.");
+                    return -1;
+                }
+
+                var spawnCherryCoordinates = _freeSquares[UnityEngine.Random.Range(0, _freeSquares.Count)];
+                cherryPositionX = spawnCherryCoordinates.x;
+                cherryPositionY = spawnCherryCoordinates.y;
             }
 
             var position = PositionManager.GetPosition(cherryPositionX, cherryPositionY);
-            var g = Instantiate(cherryPrefab);
-            g.transform.localPosition = position;
+            var cherry = Instantiate(cherryPrefab, gameObjectsParent);
+            cherry.transform.localPosition = position;
             return (cherryPositionX * Constant.FieldHeight) + cherryPositionY;
         }
 
-        void IVisualManager.Init(Game.Model.IEventManager eventsManager, float iterationTime)
+        void IVisualManager.Init(Game.Model.IEventManager eventsManager, float iterationTime, Action onCherryConsumed)
         {
+            coinEvent ??= new CoinCollectedEvent();
+            coinEvent.RemoveListener(CoinCollected);
             coinEvent.AddListener(CoinCollected);
+            _freeSquares.Clear();
             _iterationTime = iterationTime;
+            _onCherryConsumed = onCherryConsumed;
             _cherryGhostSprite = Resources.Load<Sprite>("Sprites/GhostCherry");
             _ghostASprite = Resources.Load<Sprite>("Sprites/Ghost1");
             _ghostBSprite = Resources.Load<Sprite>("Sprites/Ghost2");
 
-            eventsManager.Get<Game.Model.IPacManEvents>().OnCreatePacMan += OnCreatePacMan;
-            eventsManager.Get<Game.Model.IPacManEvents>().OnUpdatePacManPosition += OnUpdatePacManPosition;
-
-            eventsManager.Get<Game.Model.IPacManEvents>().OnCreateGhostA += OnCreateGhostA;
-            eventsManager.Get<Game.Model.IPacManEvents>().UpdateGhostAPosition += UpdateGhostAPosition;
-
-            eventsManager.Get<Game.Model.IPacManEvents>().OnCreateGhostB += OnCreateGhostB;
-            eventsManager.Get<Game.Model.IPacManEvents>().UpdateGhostBPosition += UpdateGhostBPosition;
+            var pacManEvents = eventsManager.Get<Game.Model.IPacManEvents>();
+            pacManEvents.OnCreatePacMan += OnCreatePacMan;
+            pacManEvents.OnUpdatePacManPosition += OnUpdatePacManPosition;
+            pacManEvents.OnCreateGhostA += OnCreateGhostA;
+            pacManEvents.OnUpdateGhostAPosition += UpdateGhostAPosition;
+            pacManEvents.OnCreateGhostB += OnCreateGhostB;
+            pacManEvents.OnUpdateGhostBPosition += UpdateGhostBPosition;
         }
 
         public void RotatePacMan(float degrees)
@@ -132,11 +134,11 @@ namespace Src.View
 
         public LevelModelObject GetCurrentLevel()
         {
-            if(gameObjectsParent.TryGetComponent<GameField>(out var gameField))
+            if (gameObjectsParent.TryGetComponent<GameField>(out var gameField))
             {
                 return gameField.GetFirstLevel();
             }
-            
+
             Debug.LogError("Error, no levels data");
             return null;
         }
@@ -150,36 +152,23 @@ namespace Src.View
             _ghostB.UpdateSprite(_ghostBSprite);
         }
 
-        public void ActivateGhosts()
-        {
-            if(!_ghostA.IsActive)
-            {
-                _ghostA.IsActive = true;
-            }
-
-            if(!_ghostB.IsActive)
-            {
-                _ghostB.IsActive = true;
-            }
-        }
-        
-
         private void CoinCollected(int x, int y)
         {
-            _freeSquares.Add(new Pair(x, y));
+            _freeSquares.Add(new Vector2Int(x, y));
         }
+
         private void UpdateGhostBPosition(int x, int y)
         {
-            if(_ghostB.IsActive)
+            if (_ghostB.IsActive)
             {
                 var position = PositionManager.GetPosition(x, y);
                 _ghostB.UpdatePosition(position, _iterationTime);
             }
         }
-        
+
         private void UpdateGhostAPosition(int x, int y)
         {
-            if(_ghostA.IsActive)
+            if (_ghostA.IsActive)
             {
                 var position = PositionManager.GetPosition(x, y);
                 _ghostA.UpdatePosition(position, _iterationTime);
@@ -198,10 +187,10 @@ namespace Src.View
             _ghostA = CharactersFactory.CreateGhostA(gameObjectsParent, position);
         }
 
-        private void OnCreatePacMan(int x, int y, UnityEvent unityEvent)
+        private void OnCreatePacMan(int x, int y)
         {
             var position = PositionManager.GetPosition(x, y);
-            _pacMan = CharactersFactory.CreatePacMan(gameObjectsParent, position, unityEvent);
+            _pacMan = CharactersFactory.CreatePacMan(gameObjectsParent, position, _onCherryConsumed);
         }
 
         private void OnUpdatePacManPosition(int x, int y)

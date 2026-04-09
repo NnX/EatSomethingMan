@@ -64,6 +64,7 @@
     <Analyzer Include="C:\Users\Vit\work\IDE\2022.3.62f3\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Src\Model\Objects\Coin.cs" />
     <Compile Include="Assets\Src\View\PositionManager.cs" />
     <Compile Include="Assets\GameSettings.cs" />
     <Compile Include="Assets\Src\Model\PacMan\Commands\CmdMoveGhostB.cs" />
@@ -74,7 +75,6 @@
     <Compile Include="Assets\Src\Model\PacMan\Commands\CmdCreateGhostB.cs" />
     <Compile Include="Assets\Src\View\GhostB.cs" />
     <Compile Include="Assets\Src\Model\PacMan\ModelPacMan.cs" />
-    <Compile Include="Assets\Src\Model\Objects\Сoin.cs" />
     <Compile Include="Assets\Src\Model\Base\Field\Field.cs" />
     <Compile Include="Assets\Src\Model\PacMan\Characters\GhostBChar.cs" />
     <Compile Include="Assets\Src\Misc\CoroutineInterpolator\CoroutineInterpolator.cs" />
@@ -96,11 +96,11 @@
     <Compile Include="Assets\Src\GameMediator.cs" />
     <Compile Include="Assets\Src\View\PacMan.cs" />
     <Compile Include="Assets\Src\Model\PacMan\Commands\CmdMoveGhostA.cs" />
+    <Compile Include="Assets\Src\Model\Objects\Cherry.cs" />
     <Compile Include="Assets\Src\View\IGhost.cs" />
     <Compile Include="Assets\Src\View\VisualManager.cs" />
     <Compile Include="Assets\Src\Model\Base\Field\GameField.cs" />
     <Compile Include="Assets\Src\Model\Base\ModelBase.cs" />
-    <Compile Include="Assets\Src\Model\Objects\Сherry.cs" />
     <Compile Include="Assets\NewGameClick.cs" />
     <Compile Include="Assets\Src\Model\Base\Command\Command.cs" />
     <Compile Include="Assets\Src\Model\Base\PacMan\PacManBase.cs" />

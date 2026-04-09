@@ -1,11 +1,11 @@
+using System;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Src.View
-{ 
+{
     public interface ICharactersFactory
     {
-        IPacMan CreatePacMan(Transform parentTransform, Vector2 position, UnityEvent unityEvent);
+        IPacMan CreatePacMan(Transform parentTransform, Vector2 position, Action onCherryConsumed);
         IGhost CreateGhostA(Transform parentTransform, Vector2 position);
         IGhost CreateGhostB(Transform parentTransform, Vector2 position);
     }
@@ -16,9 +16,9 @@ namespace Src.View
         [SerializeField] private GhostA ghostAPrefab;
         [SerializeField] private GhostB ghostBPrefab;
 
-        IPacMan ICharactersFactory.CreatePacMan(Transform parentTransform, Vector2 position, UnityEvent unityEvent)
+        IPacMan ICharactersFactory.CreatePacMan(Transform parentTransform, Vector2 position, Action onCherryConsumed)
         {
-            return pacManPrefab.CloneMe(parentTransform, position, unityEvent);
+            return pacManPrefab.CloneMe(parentTransform, position, onCherryConsumed);
         }
 
         IGhost ICharactersFactory.CreateGhostA(Transform parentTransform, Vector2 position)
